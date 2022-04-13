@@ -36,7 +36,7 @@ ubigint::ubigint (const string& that): uvalue(0) {
       if (not isdigit (digit)) {
          throw invalid_argument ("ubigint::ubigint(" + that + ")");
       }
-      uvalue.insert(0, digit - '0');
+      uvalue.insert(uvalue.begin(), digit - '0'); // check to make sure
    }
 }
 
@@ -74,13 +74,13 @@ ubigint ubigint::operator+ (const ubigint& that) const {
    x = (this->uvalue.size() - that.uvalue.size());
    if (x < 0) {
       for (int j = this->uvalue.size(); j < that.uvalue.size(); j++) {
-         value = that.ubigint.uvalue.at(j) + carry;
+         value = that.uvalue.at(j) + carry;
          carry = 0;
          result.uvalue.push_back(value);
       }
    }
    else if (x > 0) {
-      for (int j = that->uvalue.size(); j < this->uvalue.size(); j++) {
+      for (int j = that.uvalue.size(); j < this->uvalue.size(); j++) {
          value = this->uvalue.at(j) + carry;
          carry = 0;
          result.uvalue.push_back(value);
@@ -132,7 +132,7 @@ ubigint ubigint::operator- (const ubigint& that) const {
          result.uvalue.push_back(value);
       }
    }
-   
+   int d = result.uvalue.size();
    while (result.uvalue.at(d) == 0){
       result.uvalue.pop_back();
       d--;
@@ -152,8 +152,8 @@ ubigint ubigint::operator* (const ubigint& that) const {
       return result;
    }
 
-   this->uvalue.size() > that.uvalue.size() ? (u = that.uvalue.size() and v = this->uvalue.size()) : (u = this->uvalue.size() and v = that.uvalue.size());
-
+   this->uvalue.size() > that.uvalue.size() ? u = that.uvalue.size() : u = this->uvalue.size();
+   u == that.uvalue.size() ? v = this->uvalue.size() : v = that.uvalue.size();
    for (int k = 0; k < s; k++) {
       result.uvalue.push_back(0);
    }
@@ -187,19 +187,19 @@ void ubigint::multiply_by_2() {
 
 void ubigint::divide_by_2() {
    uint8_t carry = 0;
-   uint8_t value = 0
-      for (int i = 0; i < this->uvalue.size(); i++) {
-         value = (this->uvalue.at(i)/2);
-         if (((this->uvalue.at(i+1)%2) != 0) and (i != this->uvalue.size()-1)) {
-            value = value + 5;
-         }
-         carry = (value/10);
-         this->uvalue.at(i) = (value%10);
+   uint8_t value = 0;
+   for (int i = 0; i < this->uvalue.size(); i++) {
+      value = (this->uvalue.at(i)/2);
+      if (((this->uvalue.at(i+1)%2) != 0) and (i != this->uvalue.size()-1)) {
+         value = value + 5;
       }
-      if (carry != 0) {
-         this->uvalue.push_back(carry);
-         carry = 0;
-      }
+      carry = (value/10);
+      this->uvalue.at(i) = (value%10);
+   }
+   if (carry != 0) {
+      this->uvalue.push_back(carry);
+      carry = 0;
+   }
 }
 
 
@@ -238,7 +238,7 @@ ubigint ubigint::operator% (const ubigint& that) const {
 }
 
 bool ubigint::operator== (const ubigint& that) const {
-   if (this->uvalue.size() != that.uvaluesize()) {
+   if (this->uvalue.size() != that.uvalue.size()) {
       return false;
    }
    else {
@@ -252,7 +252,9 @@ bool ubigint::operator== (const ubigint& that) const {
 }
 
 bool ubigint::operator< (const ubigint& that) const {
-   if ((int a = this->uvalue.size()) != (int b = that.uvalue.size())) {
+   int a = 0;
+   int b = 0;
+   if ((a = this->uvalue.size()) != (b = that.uvalue.size())) {
       if (a < b) {
          return true;
       }
