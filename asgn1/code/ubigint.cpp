@@ -46,14 +46,101 @@ ubigint::ubigint (const string& that): uvalue(0) {
 ubigint ubigint::operator+ (const ubigint& that) const {
    DEBUGF ('u', *this << "+" << that);
    ubigint result;
+   int x = 0;
+   uint8_t value = 0;
+   uint8_t carry = 0;
+   int y = 0;
+   vector<uint8_t> c;
+   
+   // Checks edge case if either is 0
+   if (this->uvalue.size() == 0 or that.uvalue.size() == 0) {
+      this->uvalue.size() != 0 ? y = this->uvalue.size() : y = that.uvalue.size();
+      this->uvalue.size() != 0 ? c = this->uvalue : c = that.uvalue;
+      for (int k = 0; k < y; k++) {
+         result.uvalue.push_back(c.at(k));
+      }
+      return result;
+   }
+
+   this->uvalue.size() < that.uvalue.size() ? x = this->uvalue.size() : x = that.uvalue.size();
+   for (int i = 0; i < x; i++) {
+      value = this->uvalue.at(i) + that.uvalue.at(i) + carry;
+      if (value > 9) {
+         value = value % 10;
+         carry = 1;
+      }
+      else {
+         carry = 0;
+      }
+      result.uvalue.push_back(value);
+   }
+   x = (this->uvalue.size() - that.uvalue.size());
+   if (x < 0) {
+      for (int j = this->uvalue.size(); j < that.uvalue.size(); j++) {
+         value = that.ubigint.uvalue.at(j) + carry;
+         carry = 0;
+         result.uvalue.push_back(value);
+      }
+   }
+   else if (x > 0) {
+      for (int j = that->uvalue.size(); j < this->uvalue.size(); j++) {
+         value = this->uvalue.at(j) + carry;
+         carry = 0;
+         result.uvalue.push_back(value);
+      }
+   }
    DEBUGF ('u', result);
 
+   int d = result.uvalue.size() - 1;
+   while (result.uvalue.at(d) == 0){
+      result.uvalue.pop_back();
+      d--;
+   }
    return result;
 }
 
 ubigint ubigint::operator- (const ubigint& that) const {
    if (*this < that) throw domain_error ("ubigint::operator-(a<b)");
-   return ubigint (uvalue - that.uvalue);
+   ubigint result;
+   uint8_t value = 0;
+   uint8_t carry = 0;
+   vector<uint8_t> c;
+   int y;
+   int x = that.uvalue.size();
+
+   if (this->uvalue.size() == 0 or that.uvalue.size() == 0) {
+      this->uvalue.size() != 0 ? y = this->uvalue.size() : y = that.uvalue.size();
+      this->uvalue.size() != 0 ? c = this->uvalue : c = that.uvalue;
+      for (int k = 0; k < y; k++) {
+         result.uvalue.push_back(c.at(k));
+      }
+      return result;
+   }
+
+   for (int i = 0; i < x; i++) {
+      value = this->uvalue.at(i) - that.uvalue.at(i) - carry;
+      if (value < 0) {
+         value = value + 10;
+         carry = 1;
+      }
+      else {
+          carry = 0;
+      }
+      result.uvalue.push_back(value);
+   }
+   if (this->uvalue.size() > x) {
+      for (int j = x; j < this->uvalue.size(); j++) {
+         value = this->uvalue.at(j) - carry;
+         carry = 0;
+         result.uvalue.push_back(value);
+      }
+   }
+   
+   while (result.uvalue.at(d) == 0){
+      result.uvalue.pop_back();
+      d--;
+   }
+   return result;
 }
 
 ubigint ubigint::operator* (const ubigint& that) const {
@@ -104,11 +191,11 @@ ubigint ubigint::operator% (const ubigint& that) const {
 }
 
 bool ubigint::operator== (const ubigint& that) const {
-   if (size(this->uvalue) != size(that.uvalue)) {
+   if (this->uvalue.size() != that.uvaluesize()) {
       return false;
    }
    else {
-      for (int i = 0; i < size(this->uvalue); i++) {
+      for (int i = 0; i < this->uvalue.size(); i++) {
          if (this->uvalue.at(i) != that.uvalue.at(i)) {
             return false;
          }
@@ -118,7 +205,7 @@ bool ubigint::operator== (const ubigint& that) const {
 }
 
 bool ubigint::operator< (const ubigint& that) const {
-   if ((int a = size(this->uvalue)) != (int b = size(that.uvalue))) {
+   if ((int a = this->uvalue.size()) != (int b = that.uvalue.size())) {
       if (a < b) {
          return true;
       }
@@ -127,7 +214,7 @@ bool ubigint::operator< (const ubigint& that) const {
       }
    }
    else {
-      for (int i = size(this->uvalue); i > 0; i--) {
+      for (int i = this->uvalue.size(); i > 0; i--) {
          if (this->uvalue.at(i) > that.uvalue.at(i)) {
             return false;
          }
