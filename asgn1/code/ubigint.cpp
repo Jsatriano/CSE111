@@ -22,8 +22,12 @@ ostream& operator<< (ostream& out, const ubigint& that) {
    return out << "ubigint(" << that.uvalue << ")";
 }
 
-ubigint::ubigint (unsigned long that): uvalue (that) {
-   DEBUGF ('~', this << " -> " << uvalue)
+ubigint::ubigint (unsigned long that) {
+   while(that > 0) {
+      uvalue.push_back(that % 10);
+      that = that / 10;
+   }
+   DEBUGF ('~', this << " -> " << uvalue);
 }
 
 ubigint::ubigint (const string& that): uvalue(0) {
@@ -32,14 +36,18 @@ ubigint::ubigint (const string& that): uvalue(0) {
       if (not isdigit (digit)) {
          throw invalid_argument ("ubigint::ubigint(" + that + ")");
       }
-      uvalue = uvalue * 10 + digit - '0';
+      uvalue.insert(0, digit - '0');
+      //uvalue.push_back(digit - '0');
+      //uvalue = uvalue * 10 + digit - '0';
    }
+   //reverse(uvalue.begin(), uvalue.end());
 }
 
 ubigint ubigint::operator+ (const ubigint& that) const {
    DEBUGF ('u', *this << "+" << that);
-   ubigint result (uvalue + that.uvalue);
+   ubigint result;
    DEBUGF ('u', result);
+
    return result;
 }
 
