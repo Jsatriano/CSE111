@@ -108,10 +108,10 @@ bigint bigint::operator- (const bigint& that) const {
    else {
       result = this->uvalue - that.uvalue
       if(this->uvalue > that.uvalue) {
-         sign = true;
+         sign = false;
       }
       else {
-         sign = false;
+         sign = true;
       }
    }
 
