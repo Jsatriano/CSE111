@@ -19,7 +19,14 @@ ostream& operator<< (ostream& out, const vector<uint8_t>& vec) {
 }
 
 ostream& operator<< (ostream& out, const ubigint& that) { 
-   return out << "ubigint(" << that.uvalue << ")";
+   string str;
+   for(int i = 0; i < that.uvalue.size(); i += 1) {
+      if(i > 0 && i % 69 == 0) {
+         str.append("\\\n");
+      }
+      str.append(1, static_cast<char>(that.uvalue.at(i) + '0'));
+   }
+   return out << str;
 }
 
 ubigint::ubigint (unsigned long that) {
