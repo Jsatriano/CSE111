@@ -77,41 +77,31 @@ bigint bigint::operator- (const bigint& that) const {
    bool sign;
 
    if(this->is_negative && !that.is_negative) {
-      if(this->uvalue > that.uvalue) {
-         result = this->uvalue + that.uvalue;
-         sign = true;
-      }
-      else { 
-         result = that.uvalue - this->uvalue;
-         sign = false;
-      }
+      result = this->uvalue + that.uvalue;
+      sign = true;
    }
    else if(!this->is_negative && that.is_negative) {
+      result = this->uvalue + that.uvalue;
+      sign = false;
+   }
+   else if(!this->is_negative && !that.is_negative) {
       if(this->uvalue > that.uvalue) {
          result = this->uvalue - that.uvalue;
          sign = false;
       }
       else {
-         result = that.uvalue + this->uvalue;
-         sign = false;
-      }
-   }
-   else if(!this->is_negative && !that.is_negative) {
-      result = this->uvalue - that.uvalue;
-      if(this->uvalue > that.uvalue) {
-         sign = false;
-      }
-      else {
+         result = that.uvalue - this->uvalue;
          sign = true;
       }
    }
    else {
-      result = this->uvalue - that.uvalue
       if(this->uvalue > that.uvalue) {
-         sign = false;
+         result = this->uvalue - that.uvalue;
+         sign = true;
       }
       else {
-         sign = true;
+         result = that.uvalue - this->uvalue;
+         sign = false;
       }
    }
 
