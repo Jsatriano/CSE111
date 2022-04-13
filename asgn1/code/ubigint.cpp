@@ -5,6 +5,7 @@
 #include <exception>
 #include <stack>
 #include <stdexcept>
+#include <vector>
 using namespace std;
 
 #include "debug.h"
@@ -95,11 +96,39 @@ ubigint ubigint::operator% (const ubigint& that) const {
 }
 
 bool ubigint::operator== (const ubigint& that) const {
-   return uvalue == that.uvalue;
+   if (size(this->uvalue) != size(that.uvalue)) {
+      return false;
+   }
+   else {
+      for (int i = 0; i < size(this->uvalue); i++) {
+         if (this->uvalue.at(i) != that.uvalue.at(i)) {
+            return false;
+         }
+      }
+   }
+   return true;
 }
 
 bool ubigint::operator< (const ubigint& that) const {
-   return uvalue < that.uvalue;
+   if ((int a = size(this->uvalue)) != (int b = size(that.uvalue))) {
+      if (a < b) {
+         return true;
+      }
+      else {
+         return false;
+      }
+   }
+   else {
+      for (int i = size(this->uvalue); i > 0; i--) {
+         if (this->uvalue.at(i) > that.uvalue.at(i)) {
+            return false;
+         }
+         else if (this->uvalue.at(i) < that.uvalue.at(i)){
+            return true;
+         }
+      }
+      return false;
+   }
 }
 
 void ubigint::print() const {
