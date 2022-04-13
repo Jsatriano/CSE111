@@ -60,13 +60,9 @@ bigint bigint::operator+ (const bigint& that) const {
          sign = false;
       }
    }
-   else if(!this->is_negative && !that.is_negative) {
-      result = this->uvalue + that.uvalue;
-      sign = false;
-   }
    else {
       result = this->uvalue + that.uvalue;
-      sign = true;
+      sign = this->is_negative;
    }
 
    if(result == 0) {
