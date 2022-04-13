@@ -1,0 +1,47 @@
+head	1.2;
+access;
+symbols;
+locks;
+comment	@// @;
+
+
+1.2
+date	2022.01.11.02.41.07;	author -;	state -;
+branches;
+next	1.1;
+
+1.1
+date	2022.01.11.02.40.34;	author -;	state -;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@-
+@
+text
+@#include <iostream>
+int main() {
+  bool a, b=false, c=false;
+  a = b ^ c;
+  std::cout << a;
+}
+@
+
+
+1.1
+log
+@-
+@
+text
+@d1 1
+d3 1
+a3 1
+  bool a, b, c;
+d5 1
+@

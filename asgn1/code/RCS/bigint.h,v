@@ -1,0 +1,103 @@
+head	1.3;
+access;
+symbols;
+locks;
+comment	@ * @;
+
+
+1.3
+date	2022.01.08.01.55.54;	author -;	state -;
+branches;
+next	1.2;
+
+1.2
+date	2021.12.28.22.11.26;	author -;	state -;
+branches;
+next	1.1;
+
+1.1
+date	2021.12.28.21.54.01;	author -;	state -;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.3
+log
+@-
+@
+text
+@// $Id: bigint.h,v 1.2 2021-12-28 14:11:26-08 - - $
+
+#ifndef BIGINT_H
+#define BIGINT_H
+
+#include <exception>
+#include <iostream>
+#include <limits>
+#include <utility>
+using namespace std;
+
+#include "debug.h"
+#include "relops.h"
+#include "ubigint.h"
+
+class bigint {
+   friend ostream& operator<< (ostream&, const bigint&);
+   private:
+      ubigint uvalue {};
+      bool is_negative {false};
+   public:
+
+      bigint() = default; // Needed or will be suppressed.
+      bigint (long);
+      bigint (const ubigint&, bool is_negative = false);
+      explicit bigint (const string&);
+
+      bigint operator+() const;
+      bigint operator-() const;
+
+      bigint operator+ (const bigint&) const;
+      bigint operator- (const bigint&) const;
+      bigint operator* (const bigint&) const;
+      bigint operator/ (const bigint&) const;
+      bigint operator% (const bigint&) const;
+
+      bool operator== (const bigint&) const;
+      bool operator<  (const bigint&) const;
+
+      void print() const;
+};
+
+#endif
+
+@
+
+
+1.2
+log
+@-
+@
+text
+@d1 1
+a1 1
+// $Id: bigint.h,v 1.1 2021-12-28 13:54:01-08 - - $
+d19 1
+a19 1
+      ubigint uvalue;
+@
+
+
+1.1
+log
+@-
+@
+text
+@d1 1
+a1 1
+// $Id: bigint.h,v 1.3 2021-12-20 12:44:52-08 - - $
+d39 2
+@

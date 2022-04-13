@@ -1,0 +1,116 @@
+head	1.4;
+access;
+symbols;
+locks;
+comment	@ * @;
+
+
+1.4
+date	2022.03.21.23.02.26;	author -;	state -;
+branches;
+next	1.3;
+
+1.3
+date	2022.01.12.01.47.47;	author -;	state -;
+branches;
+next	1.2;
+
+1.2
+date	2021.12.28.22.11.26;	author -;	state -;
+branches;
+next	1.1;
+
+1.1
+date	2021.12.28.21.54.01;	author -;	state -;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.4
+log
+@-
+@
+text
+@// $Id: ubigint.h,v 1.3 2022-01-11 17:47:47-08 - - $
+
+#ifndef UBIGINT_H
+#define UBIGINT_H
+
+#include <exception>
+#include <iostream>
+#include <limits>
+#include <utility>
+#include <vector>
+using namespace std;
+
+#include "debug.h"
+#include "relops.h"
+
+class ubigint {
+   friend ostream& operator<< (ostream&, const ubigint&);
+   private:
+      using ubigvalue_t = unsigned long;
+      ubigvalue_t uvalue {};
+   public:
+      void multiply_by_2();
+      void divide_by_2();
+
+      ubigint() = default; // Need default ctor as well.
+      ubigint (unsigned long);
+      ubigint (const string&);
+
+      ubigint operator+ (const ubigint&) const;
+      ubigint operator- (const ubigint&) const;
+      ubigint operator* (const ubigint&) const;
+      ubigint operator/ (const ubigint&) const;
+      ubigint operator% (const ubigint&) const;
+
+      bool operator== (const ubigint&) const;
+      bool operator<  (const ubigint&) const;
+
+      void print() const;
+};
+
+#endif
+
+@
+
+
+1.3
+log
+@-
+@
+text
+@d1 1
+a1 1
+// $Id: ubigint.h,v 1.2 2021-12-28 14:11:26-08 - - $
+d10 1
+@
+
+
+1.2
+log
+@-
+@
+text
+@d1 1
+a1 1
+// $Id: ubigint.h,v 1.1 2021-12-28 13:54:01-08 - - $
+d13 1
+@
+
+
+1.1
+log
+@-
+@
+text
+@d1 1
+a1 1
+// $Id: ubigint.h,v 1.6 2021-12-20 12:44:52-08 - - $
+d35 2
+@
