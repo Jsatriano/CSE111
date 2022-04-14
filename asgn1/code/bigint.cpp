@@ -152,8 +152,13 @@ bool bigint::operator< (const bigint& that) const {
 
 void bigint::print() const {
    DEBUGF ('p', this << " -> " << *this);
-   if (is_negative) cout << "-";
-   uvalue.print();
+   bool neg = false;
+   if (is_negative) {
+      cout << "-";
+      neg = true;
+   }
+
+   uvalue.print(neg);
 }
 
 ostream& operator<< (ostream& out, const bigint& that) {

@@ -35,7 +35,7 @@ class ubigint {
       bool operator== (const ubigint&) const;
       bool operator<  (const ubigint&) const;
 
-      void print() const;
+      void print(bool neg) const;
 };
 
 #endif

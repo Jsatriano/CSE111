@@ -11,6 +11,8 @@ using namespace std;
 #include "debug.h"
 #include "ubigint.h"
 
+bool sign = false;
+
 ostream& operator<< (ostream& out, const vector<uint8_t>& vec) {
    for (auto itor = vec.rbegin(); itor != vec.rend(); ++itor) {
       out << int (*itor);
@@ -20,8 +22,11 @@ ostream& operator<< (ostream& out, const vector<uint8_t>& vec) {
 
 ostream& operator<< (ostream& out, const ubigint& that) { 
    string str;
-   for(int i = 0; i < that.uvalue.size(); i += 1) {
-      if(i > 0 && i % 71 == 0) {
+   for(unsigned int i = 0; i < that.uvalue.size(); i += 1) {
+      if(sign == true && i == 70) {
+         str.append("\\\n");
+      }
+      else if(i > 0 && i % 71 == 0) {
          str.append("\\\n");
       }
       str.append(1, static_cast<char>(that.uvalue.at(i) + '0'));
@@ -58,7 +63,7 @@ ubigint ubigint::operator+ (const ubigint& that) const {
    
    // Checks edge case if either is 0
    if (this->uvalue.size() == 0 or that.uvalue.size() == 0) {
-      this->uvalue.size() != 0 ? y = this->uvalue.size() : y = that.uvalue.size();
+      y = (this->uvalue.size() != 0 ? this->uvalue.size() : that.uvalue.size());
       this->uvalue.size() != 0 ? c = this->uvalue : c = that.uvalue;
       for (int k = 0; k < y; k++) {
          result.uvalue.push_back(c.at(k));
@@ -80,14 +85,14 @@ ubigint ubigint::operator+ (const ubigint& that) const {
    }
    x = (this->uvalue.size() - that.uvalue.size());
    if (x < 0) {
-      for (int j = this->uvalue.size(); j < that.uvalue.size(); j++) {
+      for (unsigned int j = this->uvalue.size(); j < that.uvalue.size(); j++) {
          value = that.uvalue.at(j) + carry;
          carry = 0;
          result.uvalue.push_back(value);
       }
    }
    else if (x > 0) {
-      for (int j = that.uvalue.size(); j < this->uvalue.size(); j++) {
+      for (unsigned int j = that.uvalue.size(); j < this->uvalue.size(); j++) {
          value = this->uvalue.at(j) + carry;
          carry = 0;
          result.uvalue.push_back(value);
@@ -106,11 +111,11 @@ ubigint ubigint::operator+ (const ubigint& that) const {
 ubigint ubigint::operator- (const ubigint& that) const {
    if (*this < that) throw domain_error ("ubigint::operator-(a<b)");
    ubigint result;
-   uint8_t value = 0;
+   int value = 0;
    uint8_t carry = 0;
    vector<uint8_t> c;
    int y;
-   int x = that.uvalue.size();
+   unsigned int x = that.uvalue.size();
 
    if (this->uvalue.size() == 0 or that.uvalue.size() == 0) {
       this->uvalue.size() != 0 ? y = this->uvalue.size() : y = that.uvalue.size();
@@ -121,7 +126,7 @@ ubigint ubigint::operator- (const ubigint& that) const {
       return result;
    }
 
-   for (int i = 0; i < x; i++) {
+   for (unsigned int i = 0; i < x; i++) {
       value = this->uvalue.at(i) - that.uvalue.at(i) - carry;
       if (value < 0) {
          value = value + 10;
@@ -133,7 +138,7 @@ ubigint ubigint::operator- (const ubigint& that) const {
       result.uvalue.push_back(value);
    }
    if (this->uvalue.size() > x) {
-      for (int j = x; j < this->uvalue.size(); j++) {
+      for (unsigned int j = x; j < this->uvalue.size(); j++) {
          value = this->uvalue.at(j) - carry;
          carry = 0;
          result.uvalue.push_back(value);
@@ -152,7 +157,7 @@ ubigint ubigint::operator* (const ubigint& that) const {
    uint8_t value = 0;
    uint8_t carry = 0;
    int s = (that.uvalue.size() * this->uvalue.size());
-   int u = 0;
+   unsigned int u = 0;
    int v = 0;
 
    if (this->uvalue.size() == 0 or that.uvalue.size() == 0) {
@@ -164,7 +169,7 @@ ubigint ubigint::operator* (const ubigint& that) const {
    for (int k = 0; k < s; k++) {
       result.uvalue.push_back(0);
    }
-   for (int i = 0; i < u; i++) {
+   for (unsigned int i = 0; i < u; i++) {
       for (int j = i; j < v; j++) {
          value = result.uvalue.at(j) + (this->uvalue.at(i) * that.uvalue.at(j)) + carry;
          carry = value / 10;
@@ -181,7 +186,7 @@ ubigint ubigint::operator* (const ubigint& that) const {
 void ubigint::multiply_by_2() {
    uint8_t carry = 0;
    uint8_t value = 0;
-   for (int i = 0; i < this->uvalue.size(); i++) {
+   for (unsigned int i = 0; i < this->uvalue.size(); i++) {
       value = (this->uvalue.at(i)*2) + carry;
       carry = (value/10);
       this->uvalue.at(i) = (value%10);
@@ -195,7 +200,7 @@ void ubigint::multiply_by_2() {
 void ubigint::divide_by_2() {
    uint8_t carry = 0;
    uint8_t value = 0;
-   for (int i = 0; i < this->uvalue.size(); i++) {
+   for (unsigned int i = 0; i < this->uvalue.size(); i++) {
       value = (this->uvalue.at(i)/2);
       if (((this->uvalue.at(i+1)%2) != 0) and (i != this->uvalue.size()-1)) {
          value = value + 5;
@@ -249,7 +254,7 @@ bool ubigint::operator== (const ubigint& that) const {
       return false;
    }
    else {
-      for (int i = 0; i < this->uvalue.size(); i++) {
+      for (unsigned int i = 0; i < this->uvalue.size(); i++) {
          if (this->uvalue.at(i) != that.uvalue.at(i)) {
             return false;
          }
@@ -282,8 +287,11 @@ bool ubigint::operator< (const ubigint& that) const {
    }
 }
 
-void ubigint::print() const {
+void ubigint::print(bool neg) const {
    DEBUGF ('p', this << " -> " << *this);
    cout << uvalue;
+   if(neg == true) {
+      sign = true;
+   }
 }
 
