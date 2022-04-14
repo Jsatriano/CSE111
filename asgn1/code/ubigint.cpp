@@ -168,7 +168,7 @@ ubigint ubigint::operator- (const ubigint& that) const {
    }
 
    int d = result.uvalue.size() - 1;
-   while (result.uvalue.at(d) == 0){
+   while (result.uvalue.at(d) == 0 and d < 0){
       result.uvalue.pop_back();
       d--;
    }
@@ -192,16 +192,24 @@ ubigint ubigint::operator* (const ubigint& that) const {
    for (int k = 0; k < s; k++) {
       result.uvalue.push_back(0);
    }
-   for (unsigned int i = 0; i < u; i++) {
-      for (int j = i; j < v; j++) {
-         value = result.uvalue.at(j) + (this->uvalue.at(i) * that.uvalue.at(j)) + carry;
+   unsigned int i = 0;
+   int j = 0;
+   for (i = 0; i < u; i++) {
+      for (j = 0; j < v; j++) {
+         value = result.uvalue.at(i+j) + (this->uvalue.at(i) * that.uvalue.at(j)) + carry;
          carry = value / 10;
-         result.uvalue.at(j) = (value%10);
+         result.uvalue.erase(result.uvalue.begin() + j + i);
+         result.uvalue.insert(result.uvalue.begin() + j + i, (value%10));
       }
       if (carry != 0) {
-         result.uvalue.push_back(carry);
+         result.uvalue.insert(result.uvalue.begin() + j + i, carry);
          carry = 0;
       }
+   }
+   int d = result.uvalue.size() - 1;
+   while (result.uvalue.at(d) == 0){
+      result.uvalue.pop_back();
+      d--;
    }
    return result;
 }
@@ -209,11 +217,14 @@ ubigint ubigint::operator* (const ubigint& that) const {
 void ubigint::multiply_by_2() {
    uint8_t carry = 0;
    uint8_t value = 0;
+   vector<uint8_t> c;
    for (unsigned int i = 0; i < this->uvalue.size(); i++) {
       value = (this->uvalue.at(i)*2) + carry;
       carry = (value/10);
-      this->uvalue.at(i) = (value%10);
+      c.push_back(value%10);
+      //this->uvalue.at(i) = (value%10);
    }
+   this->uvalue.swap(c);
    if (carry != 0) {
       this->uvalue.push_back(carry);
       carry = 0;
@@ -221,19 +232,21 @@ void ubigint::multiply_by_2() {
 }
 
 void ubigint::divide_by_2() {
-   uint8_t carry = 0;
    uint8_t value = 0;
+   vector<uint8_t> c;
    for (unsigned int i = 0; i < this->uvalue.size(); i++) {
       value = (this->uvalue.at(i)/2);
       if (((this->uvalue.at(i+1)%2) != 0) and (i != this->uvalue.size()-1)) {
          value = value + 5;
       }
-      carry = (value/10);
-      this->uvalue.at(i) = (value%10);
+      c.push_back(value);
+      //this->uvalue.at(i) = value;
    }
-   if (carry != 0) {
-      this->uvalue.push_back(carry);
-      carry = 0;
+   this->uvalue.swap(c);
+   int d = this->uvalue.size()-1;
+   while (this->uvalue.at(d) == 0){
+      this->uvalue.pop_back();
+      d--;
    }
 }
 
