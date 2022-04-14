@@ -112,6 +112,10 @@ ubigint ubigint::operator+ (const ubigint& that) const {
    }
    DEBUGF ('u', result);
 
+   if(carry > 0) {
+      result.uvalue.push_back(1);
+   }
+
    int d = result.uvalue.size() - 1;
    while (result.uvalue.at(d) == 0){
       result.uvalue.pop_back();
