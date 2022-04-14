@@ -21,7 +21,7 @@ ostream& operator<< (ostream& out, const vector<uint8_t>& vec) {
 ostream& operator<< (ostream& out, const ubigint& that) { 
    string str;
    for(int i = 0; i < that.uvalue.size(); i += 1) {
-      if(i > 0 && i % 69 == 0) {
+      if(i > 0 && i % 71 == 0) {
          str.append("\\\n");
       }
       str.append(1, static_cast<char>(that.uvalue.at(i) + '0'));
