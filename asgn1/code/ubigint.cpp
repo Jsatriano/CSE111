@@ -111,7 +111,6 @@ ubigint ubigint::operator+ (const ubigint& that) const {
       }
    }
    DEBUGF ('u', result);
-
    if(carry > 0) {
       result.uvalue.push_back(1);
    }
@@ -125,6 +124,7 @@ ubigint ubigint::operator+ (const ubigint& that) const {
 }
 
 ubigint ubigint::operator- (const ubigint& that) const {
+   cout << "hello" << endl; //
    if (*this < that) throw domain_error ("ubigint::operator-(a<b)");
    ubigint result;
    int value = 0;
@@ -134,8 +134,8 @@ ubigint ubigint::operator- (const ubigint& that) const {
    unsigned int x = that.uvalue.size();
 
    if (this->uvalue.size() == 0 or that.uvalue.size() == 0) {
-      this->uvalue.size() != 0 ? y = this->uvalue.size() : y = that.uvalue.size();
-      this->uvalue.size() != 0 ? c = this->uvalue : c = that.uvalue;
+      y = this->uvalue.size() != 0 ? this->uvalue.size() : that.uvalue.size();
+      c = this->uvalue.size() != 0 ? this->uvalue : that.uvalue;
       for (int k = 0; k < y; k++) {
          result.uvalue.push_back(c.at(k));
       }
@@ -153,14 +153,22 @@ ubigint ubigint::operator- (const ubigint& that) const {
       }
       result.uvalue.push_back(value);
    }
+
    if (this->uvalue.size() > x) {
       for (unsigned int j = x; j < this->uvalue.size(); j++) {
          value = this->uvalue.at(j) - carry;
-         carry = 0;
+         if(value < 0) {
+            value = value + 10;
+            carry = 1;
+         }
+         else {
+            carry = 0;
+         }
          result.uvalue.push_back(value);
       }
    }
-   int d = result.uvalue.size();
+
+   int d = result.uvalue.size() - 1;
    while (result.uvalue.at(d) == 0){
       result.uvalue.pop_back();
       d--;
