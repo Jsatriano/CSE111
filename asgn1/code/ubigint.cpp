@@ -124,7 +124,6 @@ ubigint ubigint::operator+ (const ubigint& that) const {
 }
 
 ubigint ubigint::operator- (const ubigint& that) const {
-   cout << "hello" << endl; //
    if (*this < that) throw domain_error ("ubigint::operator-(a<b)");
    ubigint result;
    int value = 0;
