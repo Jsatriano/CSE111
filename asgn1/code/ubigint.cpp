@@ -312,9 +312,9 @@ bool ubigint::operator< (const ubigint& that) const {
 
 void ubigint::print(bool neg) const {
    DEBUGF ('p', this << " -> " << *this);
-   cout << uvalue;
    if(neg == true) {
       sign = true;
    }
+   cout << uvalue;
 }
 
