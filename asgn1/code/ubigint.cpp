@@ -64,14 +64,14 @@ ubigint ubigint::operator+ (const ubigint& that) const {
    // Checks edge case if either is 0
    if (this->uvalue.size() == 0 or that.uvalue.size() == 0) {
       y = (this->uvalue.size() != 0 ? this->uvalue.size() : that.uvalue.size());
-      this->uvalue.size() != 0 ? c = this->uvalue : c = that.uvalue;
+      c = this->uvalue.size() != 0 ? this->uvalue : that.uvalue;
       for (int k = 0; k < y; k++) {
          result.uvalue.push_back(c.at(k));
       }
       return result;
    }
 
-   this->uvalue.size() < that.uvalue.size() ? x = this->uvalue.size() : x = that.uvalue.size();
+   x = this->uvalue.size() < that.uvalue.size() ? this->uvalue.size() : that.uvalue.size();
    for (int i = 0; i < x; i++) {
       value = this->uvalue.at(i) + that.uvalue.at(i) + carry;
       if (value > 9) {
@@ -87,14 +87,26 @@ ubigint ubigint::operator+ (const ubigint& that) const {
    if (x < 0) {
       for (unsigned int j = this->uvalue.size(); j < that.uvalue.size(); j++) {
          value = that.uvalue.at(j) + carry;
-         carry = 0;
+         if (value > 9) {
+            value = value % 10;
+            carry = 1;
+         }
+         else {
+            carry = 0;
+         }
          result.uvalue.push_back(value);
       }
    }
    else if (x > 0) {
       for (unsigned int j = that.uvalue.size(); j < this->uvalue.size(); j++) {
          value = this->uvalue.at(j) + carry;
-         carry = 0;
+         if (value > 9) {
+            value = value % 10;
+            carry = 1;
+         }
+         else {
+            carry = 0;
+         }
          result.uvalue.push_back(value);
       }
    }
