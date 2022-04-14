@@ -287,9 +287,9 @@ bool ubigint::operator== (const ubigint& that) const {
 }
 
 bool ubigint::operator< (const ubigint& that) const {
-   int a = 0;
-   int b = 0;
-   if ((a = this->uvalue.size()) != (b = that.uvalue.size())) {
+   int a = this->uvalue.size();
+   int b = that.uvalue.size();
+   if (a != b) {
       if (a < b) {
          return true;
       }
@@ -298,7 +298,7 @@ bool ubigint::operator< (const ubigint& that) const {
       }
    }
    else {
-      for (int i = this->uvalue.size(); i > 0; i--) {
+      for (int i = this->uvalue.size() - 1; i > 0; i--) {
          if (this->uvalue.at(i) > that.uvalue.at(i)) {
             return false;
          }
