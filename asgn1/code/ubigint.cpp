@@ -168,9 +168,12 @@ ubigint ubigint::operator- (const ubigint& that) const {
    }
 
    int d = result.uvalue.size() - 1;
-   while (result.uvalue.at(d) == 0 and d < 0){
+   while (result.uvalue.at(d) == 0){
       result.uvalue.pop_back();
       d--;
+      if (d < 0) {
+         break;
+      }
    }
    return result;
 }

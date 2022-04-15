@@ -27,6 +27,14 @@ void do_arith (bigint_stack& stack, const char oper) {
    bigint left = stack.top();
    stack.pop();
    DEBUGF ('d', "left = " << left);
+
+   if(oper == '/' and left == 0) {
+      cout << "dc: divide by zero" << endl;
+      stack.push(left);
+      stack.push(right);
+      return;
+   }
+
    bigint result;
    switch (oper) {
       case '+': result = left + right; break;
