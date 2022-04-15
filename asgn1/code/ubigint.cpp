@@ -1,3 +1,8 @@
+/*************************************************
+# Justin Satriano    (jsatrian)
+# Sriharsha Madala   (srmadala)
+#*************************************************/
+
 // $Id: ubigint.cpp,v 1.4 2022-03-21 16:02:26-07 - - $
 
 #include <cctype>

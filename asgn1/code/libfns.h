@@ -1,3 +1,8 @@
+/*************************************************
+# Justin Satriano    (jsatrian)
+# Sriharsha Madala   (srmadala)
+#*************************************************/
+
 // $Id: libfns.h,v 1.1 2021-12-28 13:54:01-08 - - $
 
 // Library functions not members of any class.

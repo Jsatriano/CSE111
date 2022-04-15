@@ -1,3 +1,8 @@
+/*************************************************
+# Justin Satriano    (jsatrian)
+# Sriharsha Madala   (srmadala)
+#*************************************************/
+
 // $Id: bigint.cpp,v 1.2 2021-12-28 14:11:26-08 - - $
 
 #include <cstdlib>
