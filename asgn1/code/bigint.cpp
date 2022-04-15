@@ -4,6 +4,7 @@
 #include <exception>
 #include <stack>
 #include <stdexcept>
+#include <vector>
 using namespace std;
 
 #include "bigint.h"

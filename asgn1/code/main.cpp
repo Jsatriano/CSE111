@@ -22,31 +22,33 @@ using bigint_stack = iterstack<bigint>;
 void do_arith (bigint_stack& stack, const char oper) {
    if (stack.size() < 2) throw ydc_error ("stack empty");
    bigint right = stack.top();
+   bigint correct = stack.top();
    stack.pop();
    DEBUGF ('d', "right = " << right);
    bigint left = stack.top();
    stack.pop();
    DEBUGF ('d', "left = " << left);
 
-   if(oper == '/' and left == 0) {
+   bigint result;
+   try {
+      switch (oper) {
+         case '+': result = left + right; break;
+         case '-': result = left - right; break;
+         case '*': result = left * right; break;
+         case '/': result = left / right; break;
+         case '%': result = left % right; break;
+         case '^': result = pow (left, right); break;
+         default: throw invalid_argument ("do_arith operator "s + oper);
+      }
+      DEBUGF ('d', "result = " << result);
+      stack.push (result);
+   } catch (domain_error) {
       cout << "dc: divide by zero" << endl;
       stack.push(left);
-      stack.push(right);
-      return;
+      cout << "0" << endl;
+      //cout << left << endl;
    }
 
-   bigint result;
-   switch (oper) {
-      case '+': result = left + right; break;
-      case '-': result = left - right; break;
-      case '*': result = left * right; break;
-      case '/': result = left / right; break;
-      case '%': result = left % right; break;
-      case '^': result = pow (left, right); break;
-      default: throw invalid_argument ("do_arith operator "s + oper);
-   }
-   DEBUGF ('d', "result = " << result);
-   stack.push (result);
 }
 
 void do_clear (bigint_stack& stack, const char) {

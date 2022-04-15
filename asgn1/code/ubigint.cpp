@@ -49,6 +49,11 @@ ubigint::ubigint (const string& that): uvalue(0) {
          throw invalid_argument ("ubigint::ubigint(" + that + ")");
       }
       uvalue.insert(uvalue.begin(), digit - '0'); // check to make sure
+      if (this->uvalue.size() == 1) {
+         if (this->uvalue.at(0) == 0) {
+            this->uvalue.clear();
+         }
+      }
    }
 }
 
