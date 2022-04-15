@@ -215,10 +215,12 @@ ubigint ubigint::operator* (const ubigint& that) const {
 }
 
 void ubigint::multiply_by_2() {
+   cout << "in mult" << endl; //
    uint8_t carry = 0;
    uint8_t value = 0;
    vector<uint8_t> c;
    for (unsigned int i = 0; i < this->uvalue.size(); i++) {
+     // cout << "i = " << i << endl; //
       value = (this->uvalue.at(i)*2) + carry;
       carry = (value/10);
       c.push_back(value%10);
@@ -232,22 +234,35 @@ void ubigint::multiply_by_2() {
 }
 
 void ubigint::divide_by_2() {
+   cout << "hello" << endl; //
    uint8_t value = 0;
    vector<uint8_t> c;
    for (unsigned int i = 0; i < this->uvalue.size(); i++) {
+      cout << "i = " << i << endl; //
       value = (this->uvalue.at(i)/2);
-      if (((this->uvalue.at(i+1)%2) != 0) and (i != this->uvalue.size()-1)) {
-         value = value + 5;
+      if (i != this->uvalue.size() - 1) {
+         if ((this->uvalue.at(i+1)%2) != 0) {
+            value = value + 5;
+         }
       }
       c.push_back(value);
       //this->uvalue.at(i) = value;
    }
+   
+   cout<< "past for loop" << endl; //
+
    this->uvalue.swap(c);
+   cout<< "harsha smells" << endl; //
    int d = this->uvalue.size()-1;
+   cout << "d = " << d << endl; //
    while (this->uvalue.at(d) == 0){
+      cout<< "in while loop" << endl; //
       this->uvalue.pop_back();
       d--;
+      cout<< "end of while loop" << endl; //
    }
+   cout<< "end of func" << endl; //
+   cout<< "poop" << endl; //
 }
 
 
@@ -260,17 +275,23 @@ quo_rem udivide (const ubigint& dividend, const ubigint& divisor_) {
    ubigint power_of_2 {1};
    ubigint quotient {0};
    ubigint remainder {dividend}; // left operand, dividend
+   cout<< "POOPY" << endl; //
    while (divisor < remainder) {
+      cout<< "DIV LOOP 1" << endl; //
       divisor.multiply_by_2();
       power_of_2.multiply_by_2();
    }
    while (power_of_2 > zero) {
+      cout<< "DIV LOOP 2" << endl; //
       if (divisor <= remainder) {
          remainder = remainder - divisor;
          quotient = quotient + power_of_2;
       }
+      cout<< "BEFORE DIVING" << endl; //
       divisor.divide_by_2();
       power_of_2.divide_by_2();
+      cout<< "AFTER DIVING" << endl; //
+
    }
    DEBUGF ('/', "quotient = " << quotient);
    DEBUGF ('/', "remainder = " << remainder);
