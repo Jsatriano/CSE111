@@ -14,8 +14,17 @@ using namespace std;
 bool sign = false;
 
 ostream& operator<< (ostream& out, const vector<uint8_t>& vec) {
+   int counter = 0;
+   if(sign == true) {
+      counter += 1;
+   }
    for (auto itor = vec.rbegin(); itor != vec.rend(); ++itor) {
-      out << int (*itor);
+         out << int (*itor);
+         counter += 1;
+         if(counter == 69) {
+            cout << "\\" << endl;
+            counter = 0;
+         }
    }
    return out;
 }
@@ -23,6 +32,7 @@ ostream& operator<< (ostream& out, const vector<uint8_t>& vec) {
 ostream& operator<< (ostream& out, const ubigint& that) { 
    string str;
    for(unsigned int i = 0; i < that.uvalue.size(); i += 1) {
+      cout << sign << endl;
       if(sign == true && i == 70) {
          str.append("\\\n");
       }
@@ -204,7 +214,12 @@ ubigint ubigint::operator* (const ubigint& that) const {
    int j = 0;
    for (i = 0; i < u; i++) {
       for (j = 0; j < v; j++) {
-         value = result.uvalue.at(i+j) + (this->uvalue.at(i) * that.uvalue.at(j)) + carry;
+         if(this->uvalue.size() < that.uvalue.size()) {
+            value = result.uvalue.at(i+j) + (this->uvalue.at(i) * that.uvalue.at(j)) + carry;
+         }
+         else {
+            value = result.uvalue.at(i+j) + (that.uvalue.at(i) * this->uvalue.at(j)) + carry;
+         }
          carry = value / 10;
          result.uvalue.erase(result.uvalue.begin() + j + i);
          result.uvalue.insert(result.uvalue.begin() + j + i, (value%10));
@@ -326,7 +341,7 @@ bool ubigint::operator< (const ubigint& that) const {
       }
    }
    else {
-      for (int i = this->uvalue.size() - 1; i > 0; i--) {
+      for (int i = this->uvalue.size() - 1; i >= 0; i--) {
          if (this->uvalue.at(i) > that.uvalue.at(i)) {
             return false;
          }
