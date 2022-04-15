@@ -51,7 +51,6 @@ void do_arith (bigint_stack& stack, const char oper) {
       cout << "dc: divide by zero" << endl;
       stack.push(left);
       cout << "0" << endl;
-      //cout << left << endl;
    }
 
 }

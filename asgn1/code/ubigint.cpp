@@ -250,7 +250,6 @@ void ubigint::multiply_by_2() {
       value = (this->uvalue.at(i)*2) + carry;
       carry = (value/10);
       c.push_back(value%10);
-      //this->uvalue.at(i) = (value%10);
    }
    this->uvalue.swap(c);
    if (carry != 0) {
@@ -270,7 +269,6 @@ void ubigint::divide_by_2() {
          }
       }
       c.push_back(value);
-      //this->uvalue.at(i) = value;
    }
 
    this->uvalue.swap(c);
