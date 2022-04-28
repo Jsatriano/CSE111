@@ -46,6 +46,10 @@ class inode_state {
       const string& prompt() const;
       void prompt (const string&);
       const inode_ptr get_root() const { return root; }
+      void set_root(inode_ptr);
+      void set_cwd(inode_ptr);
+      inode_ptr get_root;
+      inode_ptr get_cwd;
 };
 
 // class inode -
@@ -74,6 +78,8 @@ class inode {
       inode (file_type);
       size_t get_inode_nr() const;
       directory_entries& get_dirents();
+      base_file_ptr get_contents(); // get contents of a file
+      bool is_type() const; // check if inode is file or dir
 };
 
 
