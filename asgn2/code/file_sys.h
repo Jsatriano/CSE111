@@ -12,6 +12,9 @@ using namespace std;
 
 #include "util.h"
 
+//TODO
+// - make is_type return true if file | return false if directory
+
 // inode_t -
 //    An inode is either a directory or a plain file.
 
@@ -71,6 +74,7 @@ class inode {
       static size_t next_inode_nr;
       size_t inode_nr;
       base_file_ptr contents;
+      string path; //
    public:
       inode() = delete;
       inode (const inode&) = delete;
@@ -78,8 +82,9 @@ class inode {
       inode (file_type);
       size_t get_inode_nr() const;
       directory_entries& get_dirents();
-      base_file_ptr get_contents(); // get contents of a file
+      base_file_ptr get_contents() const {return contents;} // get contents of a file
       bool is_type() const; // check if inode is file or dir
+      string get_path() const {return path;} // gets directory path
 };
 
 
@@ -132,6 +137,7 @@ class plain_file: public base_file {
       virtual size_t size() const override;
       virtual const wordvec& readfile() const override;
       virtual void writefile (const wordvec& newdata) override;
+      virtual void mkfile (const string& filename) override; // might need to make inode_ptr instead of void
 };
 
 // class directory -
@@ -163,6 +169,7 @@ class directory: public base_file {
    public:
       virtual size_t size() const override;
       virtual void remove (const string& filename) override;
+      virtual void writefile (const wordvec& newdata) override; // Replaces the contents of a file with new contents.
       virtual inode_ptr mkdir (const string& dirname) override;
       virtual inode_ptr mkfile (const string& filename) override;
       virtual directory_entries& get_dirents() override;

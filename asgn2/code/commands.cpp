@@ -234,15 +234,138 @@ void fn_ls (inode_state& state, const wordvec& words) {
    }
 }
 
+// helper function for fn_lsr
+// recursive depth-first preorder traversal
+void lsr_work(inode_state& state, const wordvec& words) {
+   inode_ptr cwdir = state.get_cwd();
+   wordvec vec;
+   string str;
+
+   if(words.size() <= 1) {
+      str = words[0];
+   }
+   else {
+      for(int i = 1; i < words.size(); i += 1) {
+         if(i == words.size() - 1) {
+            str += words[i];
+         }
+         else {
+            str += words[i];
+            str +=  "/";
+         }
+      }
+   }
+   if(str[0] != "/") {
+      str.insert(0, "/");
+   }
+
+   bool is_dir = false;
+   wordvec lsr_vec;
+   wordvec cd_root;
+   wordvec cd_parent;
+
+   lsr_vec.clear();
+   cd_root.push_back("..");
+   cd_parent.push_back("/");
+   // if stuff is already in str
+   if(str != "/") {
+      lsr_vec.push_back(str);
+      fn_cd(state, lsr_vec);
+      fn_ls(state, lsr_vec);
+   }
+   // else its empty
+   else {
+      lsr_vec.push_back("/");
+      fn_cd(state, lsr_vec);
+      fn_ls(state, lsr_vec);
+   }
+
+   for(auto item = state.get_cwd()->get_contents()->get_dirents().begin();
+      item != state.get_cwd()->get_contents()->get_dirents().end(); item++) {
+      
+      if(item->second->get_contents()->is_type() == false) {
+         if(item->first != "." and item->first != "..") {
+            lsr_vec.clear();
+            is_dir = true;
+            lsr_vec.push_back(item->first);
+            lsr_work(state, lsr_vec); //recursive call
+            fn_cd(state, cd_parent);
+         }
+      }  
+   }
+   if(is_dir == false) {
+      return;
+   }
+}
+
 void fn_lsr (inode_state& state, const wordvec& words) {
    DEBUGF ('c', state);
    DEBUGF ('c', words);
+   inode_ptr cwdir = state.get_cwd();
+   wordvec lsr_words;
+   for(int i = 1; i < words.size(); i += 1) {
+      lsr_words.push_back(words[i]);
+      lsr_work(state, lsr_words);
+      state.get_cwd() = cwdir;
+   }
 }
 
 
 void fn_make (inode_state& state, const wordvec& words) {
    DEBUGF ('c', state);
    DEBUGF ('c', words);
+   if(words.size() == 1) {
+      throw command_error("make: missing argument");
+   }
+   
+   string str = "";
+   string file_name = words[1];
+   inode_ptr cwdir = state.get_cwd();
+   // starts at 2 because that is first word after pathname
+   for(int i = 2; i < words.size(); i += 1) {
+      if(i == words.size() - 1) {
+         str += words[i];
+      }
+      else {
+         str += words[i];
+         str += " ";
+      }
+   }
+
+   wordvec temp;
+   wordvec go_to;
+   wordvec name = split(words[1], "/");
+   if(name.size() > 1) {
+      fn_cd(state, go_to);
+      // if directory already exists, throw error
+      if(state.get_cwd()->get_path() == "/" + file_name) {
+         state.get_cwd() = cwdir;
+         throw command_error ("make: directory exists: cannot create file");
+      }
+      state.get_cwd()->get_contents()->mkfile(name[name.size() - 1]);
+      state.get_cwd()->get_contents()->writefile(temp);
+
+      state.get_cwd() = cwdir;
+   }
+   else {
+      for(auto item = cwdir->get_contents()->get_dirents().begin(); 
+         item != cwdir->get_contents()->get_dirents().end(); item++) {
+         
+         if(item->first == file_name
+            and item->second->get_contents()->is_type() == false) {
+            
+            state.get_cwd() = cwdir;
+            throw command_error ("make:" + file_name + ": already exists");
+         }
+         else is(item->first == file_name) {
+            item->second->get_contents()->writefile(temp);
+            return;
+         }
+      }
+      cwdir->get_contents()->mkfile(filename);
+      cwdir->get_contents()->writefile(temp);
+      state.get_cwd() = cwdir;
+   }
 }
 
 void fn_mkdir (inode_state& state, const wordvec& words) {
