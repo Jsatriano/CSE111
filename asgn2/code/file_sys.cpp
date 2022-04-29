@@ -98,6 +98,10 @@ directory_entries& base_file::get_dirents() {
 
 size_t plain_file::size() const {
    size_t size {0};
+   for (int i = 0; i < this->data.size(); i++) {
+      size += this->data[i].length();
+   }
+   size += (this->data.size()-1); // accounts for spaces between words
    DEBUGF ('i', "size = " << size);
    return size;
 }
@@ -113,7 +117,7 @@ void plain_file::writefile (const wordvec& words) {
 
 size_t directory::size() const {
    size_t size {0};
-
+   size = this->get_dirents().size();
    DEBUGF ('i', "size = " << size);
    return size;
 }
@@ -147,10 +151,10 @@ inode_ptr directory::mkdir (const string& dirname) {
 
 inode_ptr directory::mkfile (const string& filename) {
    DEBUGF ('i', filename);
-   filename = make_shared<inode> (file_type::PLAIN_TYPE);
+   nf = make_shared<inode> (file_type::PLAIN_TYPE);
    directory_entries& dirents = this->get_dirents();
-   dirents.insert (dirent_type (filename, filename); // this is wrong
-   //return ;
+   dirents.insert (dirent_type (filename, nf); // this is wrong
+   return nf;
 }
 
 directory_entries& directory::get_dirents() {
