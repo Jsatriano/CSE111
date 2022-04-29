@@ -372,21 +372,116 @@ void fn_make (inode_state& state, const wordvec& words) {
 void fn_mkdir (inode_state& state, const wordvec& words) {
    DEBUGF ('c', state);
    DEBUGF ('c', words);
+   if (words.size() == 1) {
+      throw command_error("mkdir: missing argument");
+   }
+   else if (words[1] == '/') {
+      throw command_error("mkdir: directory alrady exists"); // change
+   }
+   else if (words.size() > 2) {
+      throw command_error("mkdir: more than one operand specified");
+   }
+   inode_ptr cwdir = state.get_cwd();
+   string dir_name = words[1];
+
+   wordvec go_to;
+   wordvec name = split(words[1], "/");
+   dir_name = name[name.size()-1];
+
+   go_to.push_back(file_name);
+   // if entire path is given
+   if (name.size() > 1) { // shouldn't this be 2?
+      fn_cd(state, go_to);
+      // if directory already exists, throw error
+      if (state.get_cwd()->get_path() == "/" + file_name) { // ? can you just add / + file_name to get a path? also isn't this for if a different path is given
+         state.get_cwd() = cwdir; // ?
+         throw command_error ("mkdir: directory exists: cannot create file");
+      }
+      // how to check if directory already exists?
+      state.get_cwd()->get_contents->mkdir(name[name.size()-1]);
+      state.get_cwd() = cwdir; // neccesary?
+   }
+   else {
+      for (auto item = cwdir->get_contents()->get_dirents().begin(); item != cwdir->cwdir->get_contents()->get_dirents().end(); item++) {
+         // checks if name already exists
+         if (item->first == dir_name) {
+            // if name exists throws error
+            // should this check if its a file or dir?
+            throw command_error ("mkdir: " + dir_name + ": already exists");
+         }
+      }
+      cwdir->get_contents()->mkdir(dir_name);
+      state.get_cwd() = cwdir;
+   }
 }
 
 void fn_prompt (inode_state& state, const wordvec& words) {
    DEBUGF ('c', state);
    DEBUGF ('c', words);
+   if (words.size() == 1) {
+      throw command_error("prompt: missing argument");
+   }
+   string new_prompt = "";
+   for (size_t i = 1; i < words.size(); i++) {
+      new_prompt += words[i] + " ";
+   }
+   prompt(new_prompt);
 }
 
 void fn_pwd (inode_state& state, const wordvec& words) {
    DEBUGF ('c', state);
    DEBUGF ('c', words);
+   if (words.size() > 1) {
+      throw command_error("pwd: too many arguments");
+   }
+   indode_ptr cwdir = state.get_cwd();
+   if (state.get_cwd() == state.get_root) {
+      cout << "/" << endl;
+   }
+   string full_path = cwdir->get_path();
+   full_path = split(path, "/");
+   string curr_path = "/" + full_path[full_path.size()-1];
+   cout << curr_path << endl;
 }
 
 void fn_rm (inode_state& state, const wordvec& words) {
    DEBUGF ('c', state);
    DEBUGF ('c', words);
+   if (words.size() == 1) {
+      throw command_error("rm: missing argument");
+   }
+   else if (words[1] == "/") {
+      throw command_error("rm: cannot remove root directory");
+   }
+   else if (words.size() > 2) {
+      throw command_error("rm: too many arguments");
+   }
+
+   string file_name = words[1];
+   inode_ptr cwdir = state.get_cwd();
+
+   wordvec go_to;
+   // used to check if the argument is a path and not just a filename
+   wordvec name = split(words[1], "/");
+
+   // don't know if specified pathname is a file or directory
+   // how to check?
+   go_to.push_back(file_name);
+   // if an entire path is specified instead of just one name
+   if (name.size() > 1) {
+      // I'm going to assume cd checks if specified path is 
+      // a file or directory
+      fn_cd(state, go_to);
+      if (state.get_cwd()->get_path() == "/" + file_name) {
+         if (state.get_cwd()->get_contents->get_dirents().size() != 0) {
+            throw command_error("rm: Directory not empty");
+         }
+         else {
+            state.get_cwd()->get_contents.remove()
+         }
+         state.get_cwd() = cwdir;
+      }
+   }
 }
 
 void fn_rmr (inode_state& state, const wordvec& words) {
