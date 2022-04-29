@@ -108,7 +108,6 @@ void fn_cd (inode_state& state, const wordvec& words) {
          state.set_cwd(next);
       }
    }
-
 }
 
 void fn_echo (inode_state& state, const wordvec& words) {
@@ -229,8 +228,7 @@ void fn_ls (inode_state& state, const wordvec& words) {
                break;
             }
          }
-      }
-      
+      }     
    }
 }
 
@@ -335,6 +333,9 @@ void fn_make (inode_state& state, const wordvec& words) {
    wordvec temp;
    wordvec go_to;
    wordvec name = split(words[1], "/");
+
+   temp.push_back(str);
+   go_to.push_back(file_name);
    if(name.size() > 1) {
       fn_cd(state, go_to);
       // if directory already exists, throw error
@@ -357,12 +358,12 @@ void fn_make (inode_state& state, const wordvec& words) {
             state.get_cwd() = cwdir;
             throw command_error ("make:" + file_name + ": already exists");
          }
-         else is(item->first == file_name) {
+         else if(item->first == file_name) {
             item->second->get_contents()->writefile(temp);
             return;
          }
       }
-      cwdir->get_contents()->mkfile(filename);
+      cwdir->get_contents()->mkfile(file_name);
       cwdir->get_contents()->writefile(temp);
       state.get_cwd() = cwdir;
    }
