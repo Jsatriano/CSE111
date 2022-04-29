@@ -382,14 +382,22 @@ void fn_mkdir (inode_state& state, const wordvec& words) {
       throw command_error("mkdir: more than one operand specified");
    }
    inode_ptr cwdir = state.get_cwd();
+   // ^^ might be unneccesary
    string dir_name = words[1];
+   inode_ptr T = state.get_cwd();
 
    wordvec go_to;
    wordvec name = split(words[1], "/");
-   dir_name = name[name.size()-1];
+   string dir_name = name[name.size()-1];
+   //if (name[0] == "..") {
+   //   T = T->get_dirents().find("..");
+   //}
+   //if (T == T->get_dirents().end()) {
+   //   cout << "no file found" << endl;
+   //}
 
-   go_to.push_back(file_name);
-   // if entire path is given
+
+   go_to.push_back(dir_name);
    if (name.size() > 1) { // shouldn't this be 2?
       fn_cd(state, go_to);
       // if directory already exists, throw error
@@ -398,20 +406,22 @@ void fn_mkdir (inode_state& state, const wordvec& words) {
          throw command_error ("mkdir: directory exists: cannot create file");
       }
       // how to check if directory already exists?
-      state.get_cwd()->get_contents->mkdir(name[name.size()-1]);
+      state.get_cwd()->get_contents()->mkdir(name[name.size()-1]);
       state.get_cwd() = cwdir; // neccesary?
    }
    else {
-      for (auto item = cwdir->get_contents()->get_dirents().begin(); item != cwdir->cwdir->get_contents()->get_dirents().end(); item++) {
+      //for (auto item = cwdir->get_contents()->get_dirents().begin(); item != cwdir->cwdir->get_contents()->get_dirents().end(); item++) {
          // checks if name already exists
-         if (item->first == dir_name) {
+         T = T->get_dirents().find(dir_name);
+         if (T != T->get_dirents().end()) {
             // if name exists throws error
             // should this check if its a file or dir?
-            throw command_error ("mkdir: " + dir_name + ": already exists");
+            cout << "mkdir: " << dir_name << ": already exists" << endl;
+         }
+         else {
+            cwdir->get_contents().mkdir(dir_name);
          }
       }
-      cwdir->get_contents()->mkdir(dir_name);
-      state.get_cwd() = cwdir;
    }
 }
 
@@ -439,8 +449,8 @@ void fn_pwd (inode_state& state, const wordvec& words) {
       cout << "/" << endl;
    }
    string full_path = cwdir->get_path();
-   full_path = split(path, "/");
-   string curr_path = "/" + full_path[full_path.size()-1];
+   wordvec field = split(full_path, "/");
+   string curr_path = "/" + field[field.size()-1];
    cout << curr_path << endl;
 }
 

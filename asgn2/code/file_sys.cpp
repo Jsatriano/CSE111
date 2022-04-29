@@ -113,22 +113,44 @@ void plain_file::writefile (const wordvec& words) {
 
 size_t directory::size() const {
    size_t size {0};
+
    DEBUGF ('i', "size = " << size);
    return size;
 }
 
 void directory::remove (const string& filename) {
    DEBUGF ('i', filename);
+   if (this->is_type() == false) {
+      this->get_dirents().erase(filename);
+   }
+   else if (this->is_type() == true) {
+      if (this->get_dirents().size() < 2) {
+         this->get_dirents().find(filename) = nullptr; // ?
+         this->get_dirents().erase(filename);
+      }
+      else {
+         cout << "remove: folder not empty" << endl;
+      }
+   }
 }
 
 inode_ptr directory::mkdir (const string& dirname) {
    DEBUGF ('i', dirname);
-   return nullptr;
+   nd = make_shared<inode> (file_type::DIRECTORY_TYPE);
+   directory_entries& dirents = nd->get_dirents();
+   dirents.insert (dirent_type (".", nd));
+   dirents.insert (dirent_type ("..", this));
+   directory_entries& Pdirents = this->get_dirents();
+   Pdirents.insert (dirent_type (dirname, nd);
+   return nd;
 }
 
 inode_ptr directory::mkfile (const string& filename) {
    DEBUGF ('i', filename);
-   return nullptr;
+   filename = make_shared<inode> (file_type::PLAIN_TYPE);
+   directory_entries& dirents = this->get_dirents();
+   dirents.insert (dirent_type (filename, filename); // this is wrong
+   //return ;
 }
 
 directory_entries& directory::get_dirents() {
