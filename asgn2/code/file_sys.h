@@ -47,6 +47,7 @@ class inode_state {
       inode_state (const inode_state&) = delete; // copy ctor
       inode_state& operator= (const inode_state&) = delete; // op=
       inode_state();
+      ~inode_state(); // destructor that gets called implicitly at the end
       const string& prompt() const;
       void prompt (const string&);
       const inode_ptr get_root() const { return root; }

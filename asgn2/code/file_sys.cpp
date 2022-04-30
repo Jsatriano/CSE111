@@ -30,6 +30,11 @@ inode_state::inode_state() {
            << ", file_type = " << root->contents->file_type());
 }
 
+inode_state::~inode_state() {
+   // deletes tree
+   return;
+}
+
 const string& inode_state::prompt() const { return prompt_; }
 
 void inode_state::prompt (const string& new_prompt) {
