@@ -522,9 +522,11 @@ void fn_rmr (inode_state& state, const wordvec& words) {
          }
       }
    }
-   T->set_cwd(T->get_dirents().find(".."));
-   T->get_dirents().clear();
-   state.get_cwd()->get_dirents().erase(file_name);
+   if (T != state.get_root()) {
+      T->set_cwd(T->get_dirents().find(".."));
+      T->get_dirents().clear();
+      state.get_cwd()->get_dirents().erase(file_name);
+   }
 
    // delete director because it is empty
    // set cwd back to parent
