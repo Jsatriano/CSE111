@@ -42,7 +42,7 @@ class inode_state {
       inode_ptr root {nullptr};
       inode_ptr cwd {nullptr};
       string prompt_ {"% "};
-      string path; // path variable
+      string path {"/"}; // path variable
    public:
       inode_state (const inode_state&) = delete; // copy ctor
       inode_state& operator= (const inode_state&) = delete; // op=
@@ -51,11 +51,9 @@ class inode_state {
       const string& prompt() const;
       void prompt (const string&);
       const inode_ptr get_root() const { return root; }
-      void set_root(inode_ptr);
-      void set_cwd(inode_ptr);
-      void set_path(string); // sets private variable path
-      inode_ptr get_root();
-      inode_ptr get_cwd();
+      void set_cwd(inode_ptr c);
+      void set_path(const string& new_path); // sets private variable path
+      const inode_ptr get_cwd() const { return cwd; }
       string get_path() const {return path;} // gets directory path
 };
 
