@@ -77,16 +77,32 @@ void fn_cd (inode_state& state, const wordvec& words) {
    DEBUGF ('c', words);
    if(words[1] == "/" or words.size() == 1) {
       state.set_cwd(state.get_root());
+      state.set_path("/");
       return;
    }
    else if(words.size() > 2) {
       throw command_error("cd: cd takes in only 1 argument");
    }
    else {
-      bool is_dir = true;
-      shared_ptr<directory> cwdir = dynamic_pointer_cast<directory> (state.get_cwd()->get_contents());
-      inode_ptr next = dynamic_pointer_cast<inode> (cwdir);
+      bool is_dir = false;
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+      inode_ptr cwdir = state.get_cwd();
+      inode_ptr next = cwdir;
       wordvec directories = split(words[1], "/");
+      string new_path = words[1];
       for(int i = 0; i < directories.size(); i += 1) {
          next = dynamic_pointer_cast<inode> (cwdir->get_file(directories[i]));
          if(next->is_type() or next == inode_ptr()) {
@@ -106,6 +122,7 @@ void fn_cd (inode_state& state, const wordvec& words) {
       }
       else {
          state.set_cwd(next);
+         state.set_path();
       }
    }
 }

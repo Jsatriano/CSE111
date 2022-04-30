@@ -53,7 +53,7 @@ class inode_state {
       const inode_ptr get_root() const { return root; }
       void set_root(inode_ptr);
       void set_cwd(inode_ptr);
-      void set_path(inode_ptr); // sets private variable path
+      void set_path(string); // sets private variable path
       inode_ptr get_root();
       inode_ptr get_cwd();
       string get_path() const {return path;} // gets directory path
