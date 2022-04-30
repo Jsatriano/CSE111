@@ -64,6 +64,19 @@ directory_entries& inode::get_dirents() {
    return contents->get_dirents();
 }
 
+bool inode::is_type() const {
+   inode_ptr copy = this;
+   base_file_ptr contents = copy->get_contents();
+   if(auto d = dynamic_pointer_cast<directory>(contents); d) {
+      cout << "is a directory" << endl;
+      return false;
+   }
+   else {
+      cout << "is a file" << endl;
+      return true;
+   }
+}
+
 
 
 file_error::file_error (const string& what):

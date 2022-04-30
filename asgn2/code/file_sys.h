@@ -42,6 +42,7 @@ class inode_state {
       inode_ptr root {nullptr};
       inode_ptr cwd {nullptr};
       string prompt_ {"% "};
+      string path; // path variable
    public:
       inode_state (const inode_state&) = delete; // copy ctor
       inode_state& operator= (const inode_state&) = delete; // op=
@@ -53,6 +54,7 @@ class inode_state {
       void set_cwd(inode_ptr);
       inode_ptr get_root;
       inode_ptr get_cwd;
+      string get_path() const {return path;} // gets directory path
 };
 
 // class inode -
@@ -74,7 +76,6 @@ class inode {
       static size_t next_inode_nr;
       size_t inode_nr;
       base_file_ptr contents;
-      string path; //
    public:
       inode() = delete;
       inode (const inode&) = delete;
@@ -84,7 +85,6 @@ class inode {
       directory_entries& get_dirents();
       base_file_ptr get_contents() const {return contents;} // get contents of a file
       bool is_type() const; // check if inode is file or dir
-      string get_path() const {return path;} // gets directory path
 };
 
 
@@ -137,7 +137,6 @@ class plain_file: public base_file {
       virtual size_t size() const override;
       virtual const wordvec& readfile() const override;
       virtual void writefile (const wordvec& newdata) override;
-      virtual void mkfile (const string& filename) override; // might need to make inode_ptr instead of void
 };
 
 // class directory -
@@ -169,7 +168,6 @@ class directory: public base_file {
    public:
       virtual size_t size() const override;
       virtual void remove (const string& filename) override;
-      virtual void writefile (const wordvec& newdata) override; // Replaces the contents of a file with new contents.
       virtual inode_ptr mkdir (const string& dirname) override;
       virtual inode_ptr mkfile (const string& filename) override;
       virtual directory_entries& get_dirents() override;

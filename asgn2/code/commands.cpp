@@ -381,41 +381,35 @@ void fn_mkdir (inode_state& state, const wordvec& words) {
    else if (words.size() > 2) {
       throw command_error("mkdir: more than one operand specified");
    }
-   inode_ptr cwdir = state.get_cwd();
-   // ^^ might be unneccesary
-   string dir_name = words[1];
+   inode_ptr extra = state.get_cwd();
+
+   string dir_name = "";
    inode_ptr T = state.get_cwd();
 
-   wordvec go_to;
    wordvec name = split(words[1], "/");
    string dir_name = name[name.size()-1];
-   //if (name[0] == "..") {
-   //   T = T->get_dirents().find("..");
-   //}
-   //if (T == T->get_dirents().end()) {
-   //   cout << "no file found" << endl;
-   //}
 
-
-   go_to.push_back(dir_name);
-   if (name.size() > 1) { // shouldn't this be 2?
-      fn_cd(state, go_to);
-      // if directory already exists, throw error
-      if (state.get_cwd()->get_path() == "/" + file_name) { // ? can you just add / + file_name to get a path? also isn't this for if a different path is given
-         state.get_cwd() = cwdir; // ?
-         throw command_error ("mkdir: directory exists: cannot create file");
+   if (name.size() > 1) {
+      int i = 0;
+      for (i = 0; i < name.size()-1; i++) {
+         T = T->get_dirents().find(name[i]);
+         if (T == T->get_dirents().end()) {
+            cout << "mkdir: pathname doesn't exist" << endl;
+         }
       }
-      // how to check if directory already exists?
-      state.get_cwd()->get_contents()->mkdir(name[name.size()-1]);
-      state.get_cwd() = cwdir; // neccesary?
+      extra = T->get_dirents().find(name[i+1]);
+      if (extra != T->get_dirents().end()) {
+         cout << "mkdir: " << dir_name << " already exists" << endl;
+      }
+      else {
+         T->get_contents()->mkdir(name[name.size()-1]);
+      }   
    }
    else {
-      //for (auto item = cwdir->get_contents()->get_dirents().begin(); item != cwdir->cwdir->get_contents()->get_dirents().end(); item++) {
          // checks if name already exists
          T = T->get_dirents().find(dir_name);
          if (T != T->get_dirents().end()) {
             // if name exists throws error
-            // should this check if its a file or dir?
             cout << "mkdir: " << dir_name << ": already exists" << endl;
          }
          else {
@@ -468,28 +462,36 @@ void fn_rm (inode_state& state, const wordvec& words) {
    }
 
    string file_name = words[1];
-   inode_ptr cwdir = state.get_cwd();
+   inode_ptr extra = state.get_cwd();
+   inode_ptr T = state.get_cwd();
 
-   wordvec go_to;
    // used to check if the argument is a path and not just a filename
    wordvec name = split(words[1], "/");
 
-   // don't know if specified pathname is a file or directory
-   // how to check?
-   go_to.push_back(file_name);
    // if an entire path is specified instead of just one name
    if (name.size() > 1) {
-      // I'm going to assume cd checks if specified path is 
-      // a file or directory
-      fn_cd(state, go_to);
-      if (state.get_cwd()->get_path() == "/" + file_name) {
-         if (state.get_cwd()->get_contents->get_dirents().size() != 0) {
-            throw command_error("rm: Directory not empty");
+      int i = 0;
+      for (i = 0; i < name.size()-1; i++) {
+         T = T->get_dirents().find(name[i]);
+         if (T == T->get_dirents().end()) {
+            cout << "rm: pathname doesn't exist" << endl;
          }
-         else {
-            state.get_cwd()->get_contents.remove()
-         }
-         state.get_cwd() = cwdir;
+      }
+      extra = T->get_dirents().find(name[i+1]);
+      if (extra == T->get_dirents().end()) {
+         cout << "rm: " << name[i+1] << " doesn't exists" << endl;
+      }
+      else {
+         T->get_contents().remove(name[name.size()-1]);
+      }
+   }
+   else { // if pathname is only 1 word
+      T = T->get_dirents.find(name[0]);
+      if (T == T->get_dirents.end()) {
+         cout << "rm: " << name[0] << " doesn't exists" << endl;
+      }
+      else {
+         T->get_contents().remove(name[0]);
       }
    }
 }
@@ -497,5 +499,56 @@ void fn_rm (inode_state& state, const wordvec& words) {
 void fn_rmr (inode_state& state, const wordvec& words) {
    DEBUGF ('c', state);
    DEBUGF ('c', words);
+   inode_ptr T = state.get_cwd();
+   inode_ptr extra = T;
+   //wordvec name = split(words[1], "/");
+
+   if (T->get_dirents().size() > 2) {
+      for (auto i = state.get_cwd()->get_dirents().begin()+2; 
+         i != state.get_cwd->get_dirents().end(); i++) {
+         if (T->is_type() == true) {
+            // delete file
+         }
+         else if (T->is_type() == false) { // is a directory
+            wordvec x;
+            x.push_back(i->first);
+            fn_cd(state, x);
+            fn_rmr(state, x);
+         }
+      }
+   }
+   // delete director because it is empty
+   // set cwd back to parent
+   // erase .. from directory map before deleting current directory
+
+//   if (name.size() > 1) {
+//      int i = 0;
+//      for (i = 0; i < name.size()-1; i++) {
+//         T = T->get_dirents().find(name[i]);
+//         if (T == T->get_dirents().end()) {
+//            cout << "rmr: pathname doesn't exist" << endl;
+//         }
+//      }
+//      extra = T->get_dirents().find(name[i+1]);
+//      if (extra == T->get_dirents().end()) {
+//         cout << "rmr: " << name[i+1] << " doesn't exists" << endl;
+//      }
+//      else {
+//         // main part of rmr
+//         T->get_contents().remove(name[name.size()-1]);
+//      }
+//   }
+//   else {
+//      T = T->get_dirents.find(name[0]);
+//      if (T == T->get_dirents.end()) {
+//         cout << "rm: " << name[0] << " doesn't exists" << endl;
+//      }
+//      else {
+//         // main part of rmr
+//         while (T->get_dirents.size() > 2) {
+//            auto x = T->get_dirents.begin() + 2;
+//         }
+//      }
+//   }
 }
 
