@@ -137,13 +137,14 @@ size_t directory::size() const {
 
 void directory::remove (const string& filename) {
    DEBUGF ('i', filename);
-   if (this->is_type() == false) {
+   if (this->is_type() == true) {
       this->get_dirents().erase(filename);
    }
-   else if (this->is_type() == true) {
-      if (this->get_dirents().size() < 2) {
-         this->get_dirents().find(filename) = nullptr; // ?
-         this->get_dirents().erase(filename);
+   else if (this->is_type() == false) {
+      if (this->get_dirents().size() <= 2) {
+         inode_ptr extra = this->get_dirents().find("..");
+         this->get_dirents().clear(); // ?
+         extra->get_dirents().erase(filename);
       }
       else {
          cout << "remove: folder not empty" << endl;

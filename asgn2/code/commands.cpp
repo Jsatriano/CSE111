@@ -501,22 +501,31 @@ void fn_rmr (inode_state& state, const wordvec& words) {
    DEBUGF ('c', words);
    inode_ptr T = state.get_cwd();
    inode_ptr extra = T;
-   //wordvec name = split(words[1], "/");
+   wordvec name = split(words[1], "/");
+   string file_name = name[name.size()-1];
 
    if (T->get_dirents().size() > 2) {
-      for (auto i = state.get_cwd()->get_dirents().begin()+2; 
+      for (auto i = state.get_cwd()->get_dirents().begin(); 
          i != state.get_cwd->get_dirents().end(); i++) {
-         if (T->is_type() == true) {
-            // delete file
-         }
-         else if (T->is_type() == false) { // is a directory
-            wordvec x;
-            x.push_back(i->first);
-            fn_cd(state, x);
-            fn_rmr(state, x);
+         if (i->first != "." or i->first != "..") {
+            if (i->get_contents()->is_type() == true) {
+               // delete file
+               T->get_contents().remove(i->first);
+               T->get_dirents().erase(i->first);
+            }
+            else if (i->get_contents()->is_type() == false) { // is a directory
+               wordvec x;
+               x.push_back(i->first);
+               fn_cd(state, x);
+               fn_rmr(state, x);
+            }
          }
       }
    }
+   T->set_cwd(T->get_dirents().find(".."));
+   T->get_dirents().clear();
+   state.get_cwd()->get_dirents().erase(file_name);
+
    // delete director because it is empty
    // set cwd back to parent
    // erase .. from directory map before deleting current directory
