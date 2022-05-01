@@ -79,8 +79,8 @@ directory_entries& inode::get_dirents() {
 
 bool inode::is_type() const {
    inode_ptr copy = this;
-   base_file_ptr contents = copy->get_contents();
-   if(auto d = dynamic_pointer_cast<directory>(contents); d) {
+   base_file_ptr C = copy->get_contents();
+   if(auto d = dynamic_pointer_cast<directory>(C); d) {
       cout << "is a directory" << endl;
       return false;
    }
@@ -124,7 +124,7 @@ directory_entries& base_file::get_dirents() {
 
 size_t plain_file::size() const {
    size_t size {0};
-   for (int i = 0; i < this->data.size(); i++) {
+   for (unsigned int i = 0; i < this->data.size(); i++) {
       size += this->data[i].length();
    }
    size += (this->data.size()-1); // accounts for spaces between words
@@ -142,7 +142,7 @@ void plain_file::writefile (const wordvec& words) {
    data.clear();
 
    if(words.size() > 0) {
-      for(int i = 0; i < words.size(); i += 1) {
+      for(unsigned int i = 0; i < words.size(); i += 1) {
          data.push_back(words[i]);
       }
    }
@@ -150,14 +150,15 @@ void plain_file::writefile (const wordvec& words) {
 
 size_t directory::size() const {
    size_t size {0};
-   size = this->get_dirents().size();
+   size = dirents.size();
    DEBUGF ('i', "size = " << size);
    return size;
 }
 
 void directory::remove (const string& filename) {
    DEBUGF ('i', filename);
-   if (this->is_type() == true) {
+   auto x = this->get_dirents().find(filename);
+   if (this->get_contents()->is_type() == true) {
       this->get_dirents().erase(filename);
    }
    else if (this->is_type() == false) {
@@ -174,20 +175,20 @@ void directory::remove (const string& filename) {
 
 inode_ptr directory::mkdir (const string& dirname) {
    DEBUGF ('i', dirname);
-   nd = make_shared<inode> (file_type::DIRECTORY_TYPE);
-   directory_entries& dirents = nd->get_dirents();
-   dirents.insert (dirent_type (".", nd));
-   dirents.insert (dirent_type ("..", this));
+   inode_ptr nd = make_shared<inode> (file_type::DIRECTORY_TYPE);
+   directory_entries& nd_dirents = nd->get_dirents();
+   nd_dirents.insert (dirent_type (".", nd));
+   nd_dirents.insert (dirent_type ("..", this));
    directory_entries& Pdirents = this->get_dirents();
-   Pdirents.insert (dirent_type (dirname, nd);
+   Pdirents.insert (dirent_type (dirname, nd));
    return nd;
 }
 
 inode_ptr directory::mkfile (const string& filename) {
    DEBUGF ('i', filename);
-   nf = make_shared<inode> (file_type::PLAIN_TYPE);
-   directory_entries& dirents = this->get_dirents();
-   dirents.insert (dirent_type (filename, nf); // this is wrong
+   inode_ptr nf = make_shared<inode> (file_type::PLAIN_TYPE);
+   directory_entries& nf_dirents = this->get_dirents();
+   nf_dirents.insert (dirent_type (filename, nf)); // this is wrong
    return nf;
 }
 
