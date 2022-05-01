@@ -139,6 +139,13 @@ const wordvec& plain_file::readfile() const {
 
 void plain_file::writefile (const wordvec& words) {
    DEBUGF ('i', words);
+   data.clear();
+
+   if(words.size() > 0) {
+      for(int i = 0; i < words.size(); i += 1) {
+         data.push_back(words[i]);
+      }
+   }
 }
 
 size_t directory::size() const {

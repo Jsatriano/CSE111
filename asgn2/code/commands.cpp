@@ -58,16 +58,50 @@ void fn_cat (inode_state& state, const wordvec& words) {
       throw command_error("cat: /: is a directory");
    }
    else if(words.size() > 1) {
-      shared_ptr<directory> old_file = dynamic_pointer_cast<directory> (state.get_cwd()->get_contents());
-      for(int i = 1; i < words.size(); i += 1) {
-         inode_ptr new_file = old_file->get_file(words[i]);
-         if(new_file == inode_ptr()) {
-            throw command_error("cat: no such file exists");
+      inode_ptr T = state.get_cwd();
+      inode ptr S = state.get_cwd();
+      wordvec name = split(words[1], "/");
+      if(name.size() == 1) {
+         S = T->get_dirents().find(name[0]);
+         if(S == T->get_dirents().end()) {
+            cout << "cat: path doesn't exist" << endl;
+            return;
          }
          else {
-            shared_ptr<plain_file> file = dynamic_pointer_cast<plain_file> (file_content->get_contents());
-            cout << file->readfile() << endl;
+            if(S->is_type == false) {
+               throw command_error("cat: cannot cat a directory");
+            }
+            else {
+               cout << S.get_contents()->readfile() << endl;
+               return;
+            }
          }
+      }
+      else {
+         for(int i = 0; i < name.size() - 1; i += 1) {
+            S = T->get_dirents().find(name[i]);
+            if(S == T->get_dirents().end()) {
+               cout << "cat: path doesn't exist" << endl;
+               return;
+            }
+            else {
+               T = S;
+            }
+         }
+         S = T->get_dirents().find(name[name.size() - 1]);
+         if(S == T->get_dirents().end()) {
+            cout << "cat: path doesn't exist" << endl;
+            return;
+         }
+         else {
+            if(S->is_type == false) {
+               throw command_error("cat: cannot cat a directory");
+            }
+            else {
+               cout << S.get_contents()->readfile() << endl;
+               return;
+            }
+         } 
       }
    }
 }
@@ -97,7 +131,7 @@ void fn_cd (inode_state& state, const wordvec& words) {
             return;
          }
          else {
-            if (S.is_type() == false) {
+            if (S->is_type() == false) {
                T = S;
                new_path += "/" + name[i];
             }
@@ -319,24 +353,17 @@ void fn_make (inode_state& state, const wordvec& words) {
    }
    
    string str = "";
+   wordvec temp;
    string file_name = words[1];
    inode_ptr cwdir = state.get_cwd();
    // starts at 2 because that is first word after pathname
    for(int i = 2; i < words.size(); i += 1) {
-      if(i == words.size() - 1) {
-         str += words[i];
-      }
-      else {
-         str += words[i];
-         str += " ";
-      }
+         temp.push_back(words[i]);
    }
 
-   wordvec temp;
    wordvec go_to;
    wordvec name = split(words[1], "/");
 
-   temp.push_back(str);
    go_to.push_back(file_name);
    if(name.size() > 1) {
       fn_cd(state, go_to);
