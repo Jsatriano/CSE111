@@ -380,7 +380,7 @@ void fn_make (inode_state& state, const wordvec& words) {
       state.get_cwd()->get_contents()->mkfile(name[name.size() - 1]);
       state.get_cwd()->get_contents()->writefile(temp);
 
-      state.get_cwd() = cwdir;
+      state.set_cwd(cwdir);
    }
    else {
       for(auto item = cwdir->get_contents()->get_dirents().begin(); 
@@ -389,7 +389,7 @@ void fn_make (inode_state& state, const wordvec& words) {
          if(item->first == file_name
             and item->second->is_type() == false) {
             
-            state.get_cwd() = cwdir;
+            state.set_cwd(cwdir);
             throw command_error ("make:" + file_name + ": already exists");
          }
          else if(item->first == file_name) {
@@ -399,7 +399,7 @@ void fn_make (inode_state& state, const wordvec& words) {
       }
       cwdir->get_contents()->mkfile(file_name);
       cwdir->get_contents()->writefile(temp);
-      state.get_cwd() = cwdir;
+      state.set_cwd(cwdir);
    }
 }
 
