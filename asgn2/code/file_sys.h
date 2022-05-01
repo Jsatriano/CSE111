@@ -51,7 +51,7 @@ class inode_state {
       const string& prompt() const;
       void prompt (const string&);
       const inode_ptr get_root() const { return root; }
-      void set_cwd(inode_ptr c);
+      void set_cwd(inode_ptr update) { cwd = update; }
       void set_path(const string& new_path); // sets private variable path
       const inode_ptr get_cwd() const { return cwd; }
       string get_path() const {return path;} // gets directory path

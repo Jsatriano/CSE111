@@ -4,9 +4,11 @@
 #include <stdio.h>
 #include <cstddef>
 #include <string>
+#include <iomanip>
 
 #include "commands.h"
 #include "debug.h"
+
 
 const command_hash cmd_hash {
    {"cat"   , fn_cat   },
@@ -62,8 +64,8 @@ void fn_cat (inode_state& state, const wordvec& words) {
       inode ptr S = state.get_cwd();
       wordvec name = split(words[1], "/");
       if(name.size() == 1) {
-         S = T->get_dirents().find(name[0]);
-         if(S == T->get_dirents().end()) {
+         auto x = T->get_dirents().find(name[0]);
+         if(x == T->get_dirents().end()) {
             cout << "cat: path doesn't exist" << endl;
             return;
          }
@@ -78,9 +80,9 @@ void fn_cat (inode_state& state, const wordvec& words) {
          }
       }
       else {
-         for(int i = 0; i < name.size() - 1; i += 1) {
-            S = T->get_dirents().find(name[i]);
-            if(S == T->get_dirents().end()) {
+         for(auto i = 0; i < name.size() - 1; i += 1) {
+            auto x = T->get_dirents().find(name[i]);
+            if(x == T->get_dirents().end()) {
                cout << "cat: path doesn't exist" << endl;
                return;
             }
@@ -88,8 +90,8 @@ void fn_cat (inode_state& state, const wordvec& words) {
                T = S;
             }
          }
-         S = T->get_dirents().find(name[name.size() - 1]);
-         if(S == T->get_dirents().end()) {
+         auto x = T->get_dirents().find(name[name.size() - 1]);
+         if(x == T->get_dirents().end()) {
             cout << "cat: path doesn't exist" << endl;
             return;
          }
@@ -124,9 +126,9 @@ void fn_cd (inode_state& state, const wordvec& words) {
       wordvec name = split(words[1], "/");
       string new_path = T->get_path();
      
-      for(int i = 0; i < name.size(); i += 1) {
-         S = T->get_dirents().find(name[i]);
-         if (S == T->get_dirents().end()) {
+      for(auto i = 0; i < name.size(); i += 1) {
+         auto x = T->get_dirents().find(name[i]);
+         if (x == T->get_dirents().end()) {
             cout << "cd: path doesn't exist" << endl;
             return;
          }
@@ -221,7 +223,7 @@ void fn_ls (inode_state& state, const wordvec& words) {
       return;
    }
 
-   for(int i = 1; i < words.size(); i += 1) {
+   for(auto i = 1; i < words.size(); i += 1) {
       count = 0;
       end_path = directories.size();
       if(is_root == true) {
@@ -279,7 +281,7 @@ void lsr_work(inode_state& state, const wordvec& words) {
       str = words[0];
    }
    else {
-      for(int i = 1; i < words.size(); i += 1) {
+      for(auto i = 1; i < words.size(); i += 1) {
          if(i == words.size() - 1) {
             str += words[i];
          }
@@ -317,7 +319,7 @@ void lsr_work(inode_state& state, const wordvec& words) {
    for(auto item = state.get_cwd()->get_contents()->get_dirents().begin();
       item != state.get_cwd()->get_contents()->get_dirents().end(); item++) {
       
-      if(item->second->get_contents()->is_type() == false) {
+      if(item->second->is_type() == false) {
          if(item->first != "." and item->first != "..") {
             lsr_vec.clear();
             is_dir = true;
@@ -382,7 +384,7 @@ void fn_make (inode_state& state, const wordvec& words) {
          item != cwdir->get_contents()->get_dirents().end(); item++) {
          
          if(item->first == file_name
-            and item->second->get_contents()->is_type() == false) {
+            and item->second->is_type() == false) {
             
             state.get_cwd() = cwdir;
             throw command_error ("make:" + file_name + ": already exists");
@@ -404,7 +406,7 @@ void fn_mkdir (inode_state& state, const wordvec& words) {
    if (words.size() == 1) {
       throw command_error("mkdir: missing argument");
    }
-   else if (words[1] == '/') {
+   else if (words[1] == "/") {
       throw command_error("mkdir: directory alrady exists"); // change
    }
    else if (words.size() > 2) {
@@ -417,19 +419,19 @@ void fn_mkdir (inode_state& state, const wordvec& words) {
    inode_ptr S = state.get_cwd();
 
    wordvec name = split(words[1], "/");
-   string dir_name = name[name.size()-1];
+   dir_name += name[name.size()-1];
 
    if (name.size() > 1) {
-      int i = 0;
+      unsigned int i = 0;
       for (i = 0; i < name.size()-1; i++) {
-         S = T->get_dirents().find(name[i]);
-         if (S == T->get_dirents().end()) {
+         auto x = T->get_dirents().find(name[i]);
+         if (x == T->get_dirents().end()) {
             cout << "mkdir: pathname doesn't exist" << endl;
             return;
          }
       }
-      extra = T->get_dirents().find(name[i+1]);
-      if (extra != T->get_dirents().end()) {
+      auto x = T->get_dirents().find(name[i+1]);
+      if (x != T->get_dirents().end()) {
          cout << "mkdir: " << dir_name << " already exists" << endl;
          return;
       }
@@ -439,14 +441,14 @@ void fn_mkdir (inode_state& state, const wordvec& words) {
    }
    else {
          // checks if name already exists
-         S = T->get_dirents().find(dir_name);
-         if (S != T->get_dirents().end()) {
+         auto x = T->get_dirents().find(dir_name);
+         if (x != T->get_dirents().end()) {
             // if name exists throws error
             cout << "mkdir: " << dir_name << ": already exists" << endl;
             return;
          }
          else {
-            T->get_contents().mkdir(dir_name);
+            T->get_contents()->mkdir(dir_name);
          }
       }
    }
@@ -462,7 +464,7 @@ void fn_prompt (inode_state& state, const wordvec& words) {
    for (size_t i = 1; i < words.size(); i++) {
       new_prompt += words[i] + " ";
    }
-   prompt(new_prompt);
+   state.prompt(new_prompt);
 }
 
 void fn_pwd (inode_state& state, const wordvec& words) {
@@ -471,11 +473,12 @@ void fn_pwd (inode_state& state, const wordvec& words) {
    if (words.size() > 1) {
       throw command_error("pwd: too many arguments");
    }
-   indode_ptr cwdir = state.get_cwd();
-   if (state.get_cwd() == state.get_root) {
+   inode_ptr cwdir = state.get_cwd();
+   if (state.get_cwd() == state.get_root()) {
       cout << "/" << endl;
    }
-   string full_path = cwdir->get_path();
+   string full_path = "";
+   full_path += cwdir->get_path();
    wordvec field = split(full_path, "/");
    string curr_path = "/" + field[field.size()-1];
    cout << curr_path << endl;
@@ -504,31 +507,31 @@ void fn_rm (inode_state& state, const wordvec& words) {
 
    // if an entire path is specified instead of just one name
    if (name.size() > 1) {
-      int i = 0;
+      unsigned int i = 0;
       for (i = 0; i < name.size()-1; i++) {
-         S = T->get_dirents().find(name[i]);
-         if (S == T->get_dirents().end()) {
+         auto x = T->get_dirents().find(name[i]);
+         if (x == T->get_dirents().end()) {
             cout << "rm: pathname doesn't exist" << endl;
             return;
          }
       }
-      extra = T->get_dirents().find(name[i+1]);
-      if (extra == T->get_dirents().end()) {
+      auto x = T->get_dirents().find(name[i+1]);
+      if (x == T->get_dirents().end()) {
          cout << "rm: " << name[i+1] << " doesn't exists" << endl;
          return;
       }
       else {
-         T->get_contents().remove(name[name.size()-1]);
+         T->get_contents()->remove(name[name.size()-1]);
       }
    }
    else { // if pathname is only 1 word
-      S = T->get_dirents.find(name[0]);
-      if (S == T->get_dirents.end()) {
+      auto x = T->get_dirents().find(name[0]);
+      if (x == T->get_dirents().end()) {
          cout << "rm: " << name[0] << " doesn't exists" << endl;
          return;
       }
       else {
-         T->get_contents().remove(name[0]);
+         T->get_contents()->remove(name[0]);
       }
    }
 }
@@ -543,14 +546,14 @@ void fn_rmr (inode_state& state, const wordvec& words) {
 
    if (T->get_dirents().size() > 2) {
       for (auto i = state.get_cwd()->get_dirents().begin(); 
-         i != state.get_cwd->get_dirents().end(); i++) {
+         i != state.get_cwd()->get_dirents().end(); i++) {
          if (i->first != "." or i->first != "..") {
-            if (i->get_contents()->is_type() == true) {
+            if (i->second->is_type() == true) {
                // delete file
-               T->get_contents().remove(i->first);
+               T->get_contents()->remove(i->first);
                T->get_dirents().erase(i->first);
             }
-            else if (i->get_contents()->is_type() == false) { // is a directory
+            else if (i->second->is_type() == false) { // is a directory
                wordvec x;
                x.push_back(i->first);
                fn_cd(state, x);
@@ -560,7 +563,7 @@ void fn_rmr (inode_state& state, const wordvec& words) {
       }
    }
    if (T != state.get_root()) {
-      T->set_cwd(T->get_dirents().find(".."));
+      state.set_cwd(T->get_dirents().find(".."));
       T->get_dirents().clear();
       state.get_cwd()->get_dirents().erase(file_name);
    }

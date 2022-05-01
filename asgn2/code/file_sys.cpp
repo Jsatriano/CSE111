@@ -41,9 +41,9 @@ void inode_state::prompt (const string& new_prompt) {
    prompt_ = new_prompt;
 }
 
-void inode_state::set_cwd (inode_ptr c) {
-   cwd = c;
-}
+//void inode_state::set_cwd (const inode_ptr&) {
+//   cwd = c;
+//}
 
 void inode_state::set_path (const string& new_path) {
    path = new_path;
