@@ -364,7 +364,6 @@ void fn_make (inode_state& state, const wordvec& words) {
    for(auto &z: b->second->get_dirents()) {
       if (z.second == a->second) {
          u += z.first;
-         cout << u << endl;
       }
    }
    // starts at 2 because that is first word after pathname
