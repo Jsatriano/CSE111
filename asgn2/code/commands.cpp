@@ -176,7 +176,7 @@ void fn_exit (inode_state& state, const wordvec& words) {
 void print_ls(inode_state& state, auto dir_path) {
    // if at root
    if(state.get_cwd() == state.get_root()) {
-      cout << state.get_path() << ":" << endl;
+      cout << "/:" << endl;
    }
    // if not at root
    else {
@@ -229,17 +229,29 @@ void fn_ls (inode_state& state, const wordvec& words) {
       if(is_root == true) {
          state.set_cwd(state.get_root());
       }
+      cout << "in for loop" << endl;
+      cout << "directories: " << directories << endl;
+      if(words[1] == "/") {
+         state.set_cwd(state.get_root());
+         print_ls(state, words[1]);
+         state.set_cwd(retn_dir);
+         return;
+      }
       for(auto dir_path: directories) {
          count += 1;
+         cout << "hello" << endl;
+         cout << dir_path << endl;
          for(auto item: state.get_cwd()->get_contents()->get_dirents()) {
             auto end = state.get_cwd()->get_contents()->get_dirents().rbegin();
             if(dir_path == "/") {
+               cout << "if(dir_path == '/')" << endl;
                state.set_cwd(state.get_root());
                print_ls(state, dir_path);
                state.set_cwd(retn_dir);
                break;
             }
             else if(item.first == dir_path and item.second->is_type() == true) {
+               cout << "poop" << endl;
                if(count != end_path) {
                   cout << words[0] << " is an invalid name" << endl;
                   state.set_cwd(retn_dir);
@@ -250,17 +262,21 @@ void fn_ls (inode_state& state, const wordvec& words) {
                }
                break;
             }
-            else if(item.first == dir_path) { // we not at the end
-               state.set_cwd(item.second);
-               break;
-            }
-            else if(item.first == dir_path and count == end_path) { // we at the end
-               state.set_cwd(item.second);
-               print_ls(state, state.get_path());
-               state.set_cwd(retn_dir);
+            else if(item.first == dir_path) {
+               if(count == end_path) {
+                  state.set_cwd(item.second);
+                  //fn_cd(state, directories);
+                  cout << state.get_path() << endl;
+                  print_ls(state, state.get_path());
+                  state.set_cwd(retn_dir);
+               }
+               else {
+                  state.set_cwd(item.second);
+               }
                break;
             }
             else if(item.first == end->first) {
+               cout << "myself" << endl;
                cout << words[0] << "cannot access" << dir_path << ": No such file or directory" << endl;
                state.set_cwd(retn_dir);
                break;
@@ -276,6 +292,8 @@ void lsr_work(inode_state& state, const wordvec& words) {
    inode_ptr cwdir = state.get_cwd();
    wordvec vec;
    string str;
+
+   cout << "in lsr_work" << endl;
 
    if(words.size() <= 1) {
       str = words[0];
@@ -337,13 +355,25 @@ void lsr_work(inode_state& state, const wordvec& words) {
 void fn_lsr (inode_state& state, const wordvec& words) {
    DEBUGF ('c', state);
    DEBUGF ('c', words);
+   cout << "in lsr" << endl;
+   cout << "words:" << words << endl;
    inode_ptr cwdir = state.get_cwd();
    wordvec lsr_words;
+   
+    if(words.size() == 1) {
+       print_ls(state, state.get_path());
+       return;
+    }
+
    for(unsigned int i = 1; i < words.size(); i += 1) {
+      cout << "in for loop" << endl;
       lsr_words.push_back(words[i]);
       lsr_work(state, lsr_words);
+      lsr_words.clear();
+      //print_ls(state, state.get_path());
       state.set_cwd(cwdir);
    }
+   cout << "exiting lsr" << endl;
 }
 
 
