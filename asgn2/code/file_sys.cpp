@@ -124,10 +124,12 @@ directory_entries& base_file::get_dirents() {
 
 size_t plain_file::size() const {
    size_t size {0};
-   for (unsigned int i = 0; i < this->data.size(); i++) {
+   for (unsigned int i = 0; i != this->data.size(); i++) {
       size += this->data[i].length();
    }
-   size += (this->data.size()-1); // accounts for spaces between words
+   if (this->data.size() != 0) {
+      size += (this->data.size()-1); // accounts for spaces between words
+   }
    DEBUGF ('i', "size = " << size);
    return size;
 }
@@ -145,6 +147,9 @@ void plain_file::writefile (const wordvec& words) {
       for(unsigned int i = 0; i < words.size(); i += 1) {
          data.push_back(words[i]);
       }
+   }
+   if (words.size() == 0) {
+      data.clear();
    }
 }
 

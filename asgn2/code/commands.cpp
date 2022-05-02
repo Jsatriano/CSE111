@@ -367,7 +367,7 @@ void fn_make (inode_state& state, const wordvec& words) {
       }
    }
    // starts at 2 because that is first word after pathname
-   for(unsigned int i = 2; i < words.size(); i += 1) {
+   for(unsigned int i = 2; i != words.size(); i += 1) {
          temp.push_back(words[i]);
    }
 
