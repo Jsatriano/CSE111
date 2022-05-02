@@ -78,14 +78,14 @@ directory_entries& inode::get_dirents() {
 }
 
 bool inode::is_type() const {
-   inode_ptr copy = this;
-   base_file_ptr C = copy->get_contents();
+   //inode_ptr copy = this;
+   base_file_ptr C = this->get_contents();
    if(auto d = dynamic_pointer_cast<directory>(C); d) {
-      cout << "is a directory" << endl;
+      //cout << "is a directory" << endl;
       return false;
    }
    else {
-      cout << "is a file" << endl;
+      //cout << "is a file" << endl;
       return true;
    }
 }
@@ -158,14 +158,14 @@ size_t directory::size() const {
 void directory::remove (const string& filename) {
    DEBUGF ('i', filename);
    auto x = this->get_dirents().find(filename);
-   if (this->get_contents()->is_type() == true) {
+   inode_ptr a = x->second;
+   if (a->is_type() == true) {
       this->get_dirents().erase(filename);
    }
-   else if (this->is_type() == false) {
-      if (this->get_dirents().size() <= 2) {
-         inode_ptr extra = this->get_dirents().find("..");
-         this->get_dirents().clear(); // ?
-         extra->get_dirents().erase(filename);
+   else if (a->is_type() == false) {
+      if (a->get_dirents().size() <= 2) {
+         a->get_dirents().clear(); // ?
+         this->get_dirents().erase(filename);
       }
       else {
          cout << "remove: folder not empty" << endl;
@@ -176,9 +176,11 @@ void directory::remove (const string& filename) {
 inode_ptr directory::mkdir (const string& dirname) {
    DEBUGF ('i', dirname);
    inode_ptr nd = make_shared<inode> (file_type::DIRECTORY_TYPE);
+   auto x = this->get_dirents().find(".");
+   inode_ptr T = x->second;
    directory_entries& nd_dirents = nd->get_dirents();
    nd_dirents.insert (dirent_type (".", nd));
-   nd_dirents.insert (dirent_type ("..", this));
+   nd_dirents.insert (dirent_type ("..", T));
    directory_entries& Pdirents = this->get_dirents();
    Pdirents.insert (dirent_type (dirname, nd));
    return nd;

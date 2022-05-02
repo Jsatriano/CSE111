@@ -56,9 +56,10 @@ void fn_cat (inode_state& state, const wordvec& words) {
       throw command_error("cat: no file given");
    }
    // if word given is a directory
-   else if(words[1] == "/") {
-      throw command_error("cat: /: is a directory");
-   }
+   //auto y = state.get_cwd()->get_dirents().find(words[1]);
+   //if(y->second->is_type() == false) {
+   //   throw command_error("cat: /: is a directory");
+   //}
    else if(words.size() > 1) {
       inode_ptr T = state.get_cwd();
       inode_ptr S = state.get_cwd();
@@ -70,11 +71,11 @@ void fn_cat (inode_state& state, const wordvec& words) {
             return;
          }
          else {
-            if(S->is_type() == false) {
+            if(x->second->is_type() == false) {
                throw command_error("cat: cannot cat a directory");
             }
             else {
-               cout << S->get_contents()->readfile() << endl;
+               cout << x->second->get_contents()->readfile() << endl;
                return;
             }
          }
@@ -96,11 +97,11 @@ void fn_cat (inode_state& state, const wordvec& words) {
             return;
          }
          else {
-            if(S->is_type() == false) {
+            if(x->second->is_type() == false) {
                throw command_error("cat: cannot cat a directory");
             }
             else {
-               cout << S->get_contents()->readfile() << endl;
+               cout << x->second->get_contents()->readfile() << endl;
                return;
             }
          } 
@@ -352,50 +353,71 @@ void fn_make (inode_state& state, const wordvec& words) {
    if(words.size() == 1) {
       throw command_error("make: missing argument");
    }
-   
    string str = "";
    wordvec temp;
    string file_name = words[1];
    inode_ptr cwdir = state.get_cwd();
+
+   string u = "";
+   auto a = cwdir->get_dirents().find(".");
+   auto b = cwdir->get_dirents().find("..");
+   for(auto &z: b->second->get_dirents()) {
+      if (z.second == a->second) {
+         u += z.first;
+         cout << u << endl;
+      }
+   }
    // starts at 2 because that is first word after pathname
    for(unsigned int i = 2; i < words.size(); i += 1) {
          temp.push_back(words[i]);
    }
 
-   wordvec go_to;
    wordvec name = split(words[1], "/");
-
-   go_to.push_back(file_name);
+   inode_ptr T = state.get_cwd();
+   
+   string dir_name = "";
+   dir_name += name[name.size()-1];
    if(name.size() > 1) {
-      fn_cd(state, go_to);
-      // if directory already exists, throw error
-      if(state.get_path() == "/" + file_name) {
-         state.set_cwd(cwdir);
-         throw command_error ("make: directory exists: cannot create file");
-      }
-      state.get_cwd()->get_contents()->mkfile(name[name.size() - 1]);
-      state.get_cwd()->get_contents()->writefile(temp);
-
-      state.set_cwd(cwdir);
-   }
-   else {
-      for(auto item = cwdir->get_contents()->get_dirents().begin(); 
-         item != cwdir->get_contents()->get_dirents().end(); item++) {
-         
-         if(item->first == file_name
-            and item->second->is_type() == false) {
-            
-            state.set_cwd(cwdir);
-            throw command_error ("make:" + file_name + ": already exists");
-         }
-         else if(item->first == file_name) {
-            item->second->get_contents()->writefile(temp);
+      unsigned int i = 0;
+      for (i = 0; i < name.size()-1; i++) {
+         auto x = T->get_dirents().find(name[i]);
+         if (x == T->get_dirents().end()) {
+            cout << "mk: pathname doesn't exist" << endl;
             return;
          }
       }
-      cwdir->get_contents()->mkfile(file_name);
-      cwdir->get_contents()->writefile(temp);
-      state.set_cwd(cwdir);
+      auto x = T->get_dirents().find(name[i+1]);
+      if (x != T->get_dirents().end() or u == dir_name) {
+         if (u == dir_name or x->second->is_type() == false) {
+            cout << "mk: " << dir_name << " already exists" << endl;
+            return;
+         }
+         else {
+            x->second->get_contents()->writefile(temp);
+         }
+      }
+      else {
+         T->get_contents()->mkfile(name[name.size()-1]);
+         x = T->get_dirents().find(name[i+1]);
+         x->second->get_contents()->writefile(temp);
+      }
+   }
+   else {
+      auto x = T->get_dirents().find(dir_name);
+      if (x != T->get_dirents().end() or u == dir_name) {
+         if (u == dir_name or x->second->is_type() == false) {
+            cout << "mk: " << dir_name << ": already exists as a directory" << endl;
+            return;
+         }
+         else {
+            x->second->get_contents()->writefile(temp);
+         }
+      }
+      else {
+         T->get_contents()->mkfile(dir_name);
+         x = T->get_dirents().find(name[0]);
+         x->second->get_contents()->writefile(temp);
+      }
    }
 }
 
@@ -412,6 +434,15 @@ void fn_mkdir (inode_state& state, const wordvec& words) {
       throw command_error("mkdir: more than one operand specified");
    }
    inode_ptr extra = state.get_cwd();
+
+   string u = "";
+   auto a = extra->get_dirents().find(".");
+   auto b = extra->get_dirents().find("..");
+   for(auto &z: b->second->get_dirents()) {
+      if (z.second == a->second) {
+         u += z.first;
+      }
+   }
 
    string dir_name = "";
    inode_ptr T = state.get_cwd();
@@ -430,7 +461,7 @@ void fn_mkdir (inode_state& state, const wordvec& words) {
          }
       }
       auto x = T->get_dirents().find(name[i+1]);
-      if (x != T->get_dirents().end()) {
+      if (x != T->get_dirents().end() or u == name[i+1]) {
          cout << "mkdir: " << dir_name << " already exists" << endl;
          return;
       }
@@ -441,7 +472,7 @@ void fn_mkdir (inode_state& state, const wordvec& words) {
    else {
       // checks if name already exists
       auto x = T->get_dirents().find(dir_name);
-      if (x != T->get_dirents().end()) {
+      if (x != T->get_dirents().end() or u == dir_name) {
          // if name exists throws error
          cout << "mkdir: " << dir_name << ": already exists" << endl;
          return;
