@@ -301,125 +301,107 @@ void fn_ls (inode_state& state, const wordvec& words) {
 // helper function for fn_lsr
 // recursive depth-first preorder traversal
 void lsr_work(inode_state& state, const wordvec& words) {
-   inode_ptr cwdir = state.get_cwd();
-   wordvec vec;
-   string str;
+   wordvec h;
+   inode_ptr T = state.get_cwd();
+   print_ls(state, state.get_path());
+   if(state.get_cwd()->get_dirents().size() > 2) {
+      for(auto i = state.get_cwd()->get_dirents().begin();
+         i != state.get_cwd()->get_dirents().end(); i++) {
 
-   cout << "in lsr_work" << endl;
-
-   // 
-   if(words.size() <= 1) {
-   cout << "line 312" << endl;
-      str = words[0];
-   }
-   else {
-      for(unsigned int i = 1; i < words.size(); i += 1) {
-         if(i == words.size() - 1) {
-            str += words[i];
-         }
-         else {
-            str += words[i];
-            str +=  "/";
+         if(i->first != "." and i->first != "..") {
+            if(i->second->is_type() == false) {
+               h.clear();
+               h.push_back("lsr");
+               h.push_back(i->first);
+               fn_cd(state, h);
+               lsr_work(state, h);
+            }
          }
       }
    }
-   //if(str[0] != '/') {
-   //   str = "/" + str;
-   //}
-
-   bool is_dir = false;
-   wordvec lsr_vec;
-   wordvec cd_root;
-   wordvec cd_parent;
-
-   lsr_vec.clear();
-   cd_root.push_back("..");
-   cd_parent.push_back("/");
-   // if stuff is already in str
-   if(str != "/") {
-      cout << "line 339" << endl;
-      lsr_vec.push_back("lsr");
-      lsr_vec.push_back(str);
-      fn_cd(state, lsr_vec);
-      fn_ls(state, lsr_vec);
+   if(state.get_cwd() != state.get_root()) {
+      h.clear();
+      h.push_back("lsr");
+      h.push_back("..");
+      fn_cd(state, h);
    }
-   // else its empty
-   else {
-      lsr_vec.push_back("/");
-      fn_cd(state, lsr_vec);
-      fn_ls(state, lsr_vec);
-   }
-
-   cout << "line 352" << endl;
-   for(auto item = state.get_cwd()->get_dirents().begin();
-      item != state.get_cwd()->get_dirents().end(); item++) {
-
-      cout << "hello" << endl;
-      if(item->second->is_type() == false) {
-         if(item->first != "." and item->first != "..") {
-            lsr_vec.clear();
-            is_dir = true;
-            lsr_vec.push_back("lsr");
-            lsr_vec.push_back(item->first);
-            lsr_work(state, lsr_vec); //recursive call
-            fn_cd(state, cd_parent);
-         }
-      }  
-   }
-   if(is_dir == false) {
-      return;
-   }
+   
 }
 
 void fn_lsr (inode_state& state, const wordvec& words) {
    DEBUGF ('c', state);
    DEBUGF ('c', words);
-//   cout << "in lsr" << endl;
-//   cout << "words:" << words << endl;
-//   inode_ptr cwdir = state.get_cwd();
-//   wordvec lsr_words;
-//
-//   for (auto i = state.get_cwd()->get_dirents().begin();
-//      i != state.get_cwd()->get_dirents().end(); i++) {
-//      cout << "file is " << i->first << endl;
-//      if (i->first != "." and i->first != "..") {
-//         if (i->second->is_type() == true) {
-//            // delete file
-//            cout << "delete file" << endl;
-//            state.get_cwd()->get_contents()->remove(i->first);
-//         }
-//         else if (i->second->is_type() == false) { // is a directory
-//            h.clear();
-//            h.push_back("rmr");
-//            h.push_back(i->first);
-//            fn_cd(state, h);
-//            fn_rmr(state, h);
-//         }
-//      }
-//   }
-//   if (state.get_cwd() != state.get_root()) {
-//      auto x = state.get_cwd()->get_dirents().find("..");
-//      state.set_cwd(x->second);
-//      state.get_cwd()->get_dirents().clear();
-//      cout << "delete dir" << endl;
-//      state.get_cwd()->get_dirents().erase();
-//   }
-   //   // if no path given, ls is done
-   //   if(words.size() == 1) {
-   //      print_ls(state, state.get_path());
-   //      return;
-   //   }
-   //
-   //   // if path given
-   //   for(unsigned int i = 1; i < words.size(); i += 1) {
-   //      cout << "in for loop" << endl;
-   //      lsr_words.push_back(words[i]);
-   //      lsr_work(state, lsr_words);
-   //      lsr_words.clear();
-   //      //print_ls(state, state.get_path());
-   //      state.set_cwd(cwdir);
-   //   }
-   //   cout << "exiting lsr" << endl;
+   inode_ptr T = state.get_cwd();
+   wordvec h;
+   wordvec name;
+   if(words.size() == 1) {
+      h.clear();
+      h.push_back("lsr");
+      h.push_back(".");
+      fn_cd(state, h);
+      lsr_work(state, h);
+      //print_ls(state, state.get_path());
+      return;
+   }
+   if(state.get_cwd() != state.get_root()) {
+      name = split(words[1], "/");
+   }
+   else {
+      name.push_back(words[1]);
+   }
+   string file_name = name[name.size() - 1];
+
+   if(name.size() <= 1) {
+      if(T != state.get_root()) {
+         auto y = T->get_dirents().find(file_name);
+         if(y == T->get_dirents().end()) {
+            cout << file_name << "doesn't exist" << endl;
+         }
+         else if(y->second->is_type() == true) {
+            cout << "unable to call lsr on file" << endl;
+         }
+         else {
+            h.clear();
+            h.push_back("lsr");
+            h.push_back(y->first);
+            fn_cd(state, h);
+         }
+      }
+      lsr_work(state, h);
+   }
+   else {
+      unsigned int i = 0;
+      for(i = 0; i < name.size() - 1; i += 1) {
+         auto y = T->get_dirents().find(name[i]);
+         if(y == T->get_dirents().end() or
+            (i < name.size() - 1 and y->second->is_type() == true)) {
+            
+            cout << "path name doesn't exist" << endl;
+            return;
+         }
+         else {
+            h.clear();
+            h.push_back("lsr");
+            h.push_back(y->first);
+            fn_cd(state, h);
+         }
+      }
+      auto y = state.get_cwd()->get_dirents().find(name[i]);
+      if(y == state.get_cwd()->get_dirents().end()) {
+         cout << "path name doesn't exist" << endl;
+         return;
+      }
+      else if(y->second->is_type() == true) {
+         cout << "unable to call lsr on file" << endl;
+      }
+      else {
+         h.clear();
+         h.push_back("lsr");
+         h.push_back(y->first);
+         fn_cd(state, h);
+      }
+      lsr_work(state, h);
+   }
 }
 
 
