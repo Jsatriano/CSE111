@@ -1,3 +1,8 @@
+//*************************************************
+// Justin Satriano    (jsatrian)
+// Sriharsha Madala   (srmadala)
+//*************************************************
+
 // $Id: main.cpp,v 1.13 2022-01-26 13:23:48-08 - - $
 
 #include <cstdlib>
@@ -67,8 +72,12 @@ int main (int argc, char** argv) {
             // function.  Complain or call it.
             wordvec words = split (line, " \t");
             DEBUGF ('y', "words = " << words);
-            command_fn fn = find_command_fn (words.at(0));
-            fn (state, words);
+            if(words.size() != 0) {
+               if(words.at(0) != "#") {
+                  command_fn fn = find_command_fn (words.at(0));            
+                  fn (state, words);
+               }
+            }
          }catch (file_error& error) {
             complain() << error.what() << endl;
          }catch (command_error& error) {
