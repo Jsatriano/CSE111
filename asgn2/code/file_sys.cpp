@@ -32,33 +32,22 @@ inode_state::inode_state() {
 
 inode_state::~inode_state() {
    inode_ptr T = root;
-   string g = "";
-   g += path;
-   string err;
-   err += "38";
    inode_ptr U = root;
    inode_ptr V;
    if (root->get_dirents().size() > 2) {
       while ((U->get_dirents().size() > 2) or (U != root)) {
          for (auto i = U->get_dirents().begin();
          i != U->get_dirents().end(); i++) {
-            cout << "you are at " << i->first << endl;
             if (i->first != "." and i->first != "..") {
                if (i->second->is_type() == false) {
                   U = i->second;
-                  err.clear();
-                  err += i->first;
-                  cout << i->first << endl;
                   break;
                }
                else {
-                  err.clear();
-                  err += i->first;
                   U->get_dirents().erase(i->first);
                }
             }
          }
-         cout << "61 " << err << endl;
          if ((U->get_dirents().size() == 2) and U != root) {
             V = U;
             auto x = U->get_dirents().find("..");
@@ -67,7 +56,6 @@ inode_state::~inode_state() {
             for (auto i = U->get_dirents().begin();
             i != U->get_dirents().end(); i++) {
                if (i->second == V) {
-                  cout << "working" << endl;
                   U->get_dirents().erase(i->first);
                   break;
                }
@@ -75,7 +63,6 @@ inode_state::~inode_state() {
          }
       }
    }
-   cout << "done" << endl;
    root->get_dirents().clear();
    return;
 }
